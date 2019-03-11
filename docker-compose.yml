@@ -1,0 +1,76 @@
+version: "3.0"
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: edsd5450
+      POSTGRES_USER: sysa
+      POSTGRES_DB: spc_hc_unilever
+  api:
+    image: node
+    ports:
+      - "3333:3333"
+    depends_on:
+      - postgres
+      - redis
+    command:
+      ["bash", "/usr/src/UT_HC_Control_Estadistico_Proceso/api/getenv.sh"]
+    volumes:
+      - ./api:/usr/src/UT_HC_Control_Estadistico_Proceso/api
+    environment:
+      HOST: 127.0.0.1
+      PORT: 3333
+      NODE_ENV: development
+      APP_NAME: SPC_HC
+      APP_KEY: x7Sf7NijdcyVmZEdyrQKR3LtjG0dp7CM
+      DB_CONNECTION: pg
+      DB_USER: sysa
+      DB_PASSWORD: edsd5450
+      DB_DATABASE: spc_hc_unilever
+      DB_CONNECTION_WINCC: mssql
+      DB_HOST_WINCC: 192.168.1.22\WINCC
+      DB_PORT_WINCC: 49263
+      DB_USER_WINCC: sysa
+      DB_PASSWORD_WINCC: edsd5450
+      DB_DATABASE_WINCC: Statistics
+      HASH_DRIVER: bcrypt
+      MAIL_CONNECTION: smtp
+      SMTP_HOST: smtp.gmail.com
+      MAIL_USERNAME: alarmas.unilver@gmail.com
+      MAIL_PASSWORD: edsd5450
+  client:
+    image: node
+    ports:
+      - "8080:3000"
+    depends_on:
+      - api
+    command: [""]
+    volumes:
+      - ./client:/usr/src/UT_HC_Control_Estadistico_Proceso/client
+    environment:
+      HOST: 127.0.0.1
+      PORT: 3333
+      NODE_ENV: development
+      APP_NAME: SPC_HC
+      APP_KEY: x7Sf7NijdcyVmZEdyrQKR3LtjG0dp7CM
+      DB_CONNECTION: pg
+      DB_USER: sysa
+      DB_PASSWORD: edsd5450
+      DB_DATABASE: spc_hc_unilever
+      DB_CONNECTION_WINCC: mssql
+      DB_HOST_WINCC: 192.168.1.22\WINCC
+      DB_PORT_WINCC: 49263
+      DB_USER_WINCC: sysa
+      DB_PASSWORD_WINCC: edsd5450
+      DB_DATABASE_WINCC: Statistics
+      HASH_DRIVER: bcrypt
+      MAIL_CONNECTION: smtp
+      SMTP_HOST: smtp.gmail.com
+      MAIL_USERNAME: alarmas.unilver@gmail.com
+      MAIL_PASSWORD: edsd5450
