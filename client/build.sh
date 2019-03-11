@@ -1,2 +1,3 @@
-#command docker --version
-echo "Build web pack wait moment ...."
+command yarn install
+command yarn run build
+command yarn run start

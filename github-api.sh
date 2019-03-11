@@ -1,5 +1,4 @@
 #!/bin/bash
-command docker --version
 push=false
 
 function apigithub()
@@ -20,21 +19,21 @@ function apigithub()
 
 		if [ $sha != $sha_old ] && [ $length_type_commit -lt 7 ]; then
 			if [ $type_commit = "API" ]; then 
-				command bash ./api/build.sh
+				command bash ./api/restart.sh
 			fi
 			
 			if [ $type_commit = "CLIENT" ]; then 
-				command bash ./client/build.sh
+				command bash ./client/restart.sh
 			fi
 
 			if [ $type_commit = "DATA" ]; then 
-				command bash ./data/build.sh
+				command bash ./data/restart.sh
 			fi
 
 			if [ $type_commit = "GLOBAL" ]; then 
-				command bash ./api/build.sh
-				command bash ./client/build.sh
-				command bash ./data/build.sh
+				command bash ./api/restart.sh
+				command bash ./client/restart.sh
+				command bash ./data/restart.sh
 			fi
 			sha_old=$sha
 		fi

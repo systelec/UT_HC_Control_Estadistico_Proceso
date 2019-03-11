@@ -2,37 +2,44 @@ version: "3.0"
 services:
   redis:
     image: redis
-    ports:
-      - "6379:6379"
-  postgres:
+    container_name: "ut_hc_control_estadistico_proceso_database_memory"
+    networks:
+      - webnet
+  database:
     image: postgres
+    container_name: "ut_hc_control_estadistico_proceso_database"
+    volumes:
+      - ./database/data:/var/lib/postgresql/data
+      - ./database/migrations:/home/migrations
+      - ./database/seeders:/home/seeders
     ports:
-      - "5432:5432"
+      - "5434:5432"
     environment:
       POSTGRES_PASSWORD: edsd5450
       POSTGRES_USER: sysa
-      POSTGRES_DB: spc_hc_unilever
+      POSTGRES_DB: ut_hc_control_estadistico_proceso
+    networks:
+      - webnet
   api:
-    image: node
-    ports:
-      - "3333:3333"
+    image: adonisjs
+    container_name: "ut_hc_control_estadistico_proceso_api"
     depends_on:
-      - postgres
+      - database
       - redis
-    command:
-      ["bash", "/usr/src/UT_HC_Control_Estadistico_Proceso/api/getenv.sh"]
     volumes:
-      - ./api:/usr/src/UT_HC_Control_Estadistico_Proceso/api
+      - ./api:/home/api
+    working_dir: "/home/api"
     environment:
-      HOST: 127.0.0.1
+      HOST: 0.0.0.0
       PORT: 3333
       NODE_ENV: development
       APP_NAME: SPC_HC
       APP_KEY: x7Sf7NijdcyVmZEdyrQKR3LtjG0dp7CM
       DB_CONNECTION: pg
+      DB_HOST: database
       DB_USER: sysa
       DB_PASSWORD: edsd5450
-      DB_DATABASE: spc_hc_unilever
+      DB_DATABASE: ut_hc_control_estadistico_proceso
       DB_CONNECTION_WINCC: mssql
       DB_HOST_WINCC: 192.168.1.22\WINCC
       DB_PORT_WINCC: 49263
@@ -44,33 +51,37 @@ services:
       SMTP_HOST: smtp.gmail.com
       MAIL_USERNAME: alarmas.unilver@gmail.com
       MAIL_PASSWORD: edsd5450
+      CONTAINER_NAME: "ut_hc_control_estadistico_proceso_api"
+    command: ["bash", "/home/api/build.sh"]
+    networks:
+      - webnet
   client:
-    image: node
-    ports:
-      - "8080:3000"
+    image: nuxtjs
+    container_name: "ut_hc_control_estadistico_proceso_client"
     depends_on:
       - api
-    command: [""]
     volumes:
-      - ./client:/usr/src/UT_HC_Control_Estadistico_Proceso/client
+      - ./client:/home/client
+    working_dir: "/home/client"
     environment:
-      HOST: 127.0.0.1
-      PORT: 3333
-      NODE_ENV: development
-      APP_NAME: SPC_HC
-      APP_KEY: x7Sf7NijdcyVmZEdyrQKR3LtjG0dp7CM
-      DB_CONNECTION: pg
-      DB_USER: sysa
-      DB_PASSWORD: edsd5450
-      DB_DATABASE: spc_hc_unilever
-      DB_CONNECTION_WINCC: mssql
-      DB_HOST_WINCC: 192.168.1.22\WINCC
-      DB_PORT_WINCC: 49263
-      DB_USER_WINCC: sysa
-      DB_PASSWORD_WINCC: edsd5450
-      DB_DATABASE_WINCC: Statistics
-      HASH_DRIVER: bcrypt
-      MAIL_CONNECTION: smtp
-      SMTP_HOST: smtp.gmail.com
-      MAIL_USERNAME: alarmas.unilver@gmail.com
-      MAIL_PASSWORD: edsd5450
+      HOST: 0.0.0.0
+      PORT: 3000
+      CONTAINER_NAME: "ut_hc_control_estadistico_proceso_client"
+    command: ["bash", "/home/client/build.sh"]
+    networks:
+      - webnet
+  proxy:
+    image: nginx
+    container_name: "ut_hc_control_estadistico_proceso_proxy"
+    ports:
+      - "8080:80"
+    volumes:
+      - ./proxy:/etc/nginx/conf.d
+    depends_on:
+      - client
+      - api
+    networks:
+      - webnet
+networks:
+  webnet:
+    driver: bridge

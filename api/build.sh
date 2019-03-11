@@ -1,2 +1,3 @@
-#command docker --version
-echo "Build ARI REST wait moment ...."
+command bash ./getenv.sh
+command yarn install
+command adonis serve --dev
