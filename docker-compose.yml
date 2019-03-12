@@ -51,7 +51,6 @@ services:
       SMTP_HOST: smtp.gmail.com
       MAIL_USERNAME: alarmas.unilver@gmail.com
       MAIL_PASSWORD: edsd5450
-      CONTAINER_NAME: "ut_hc_control_estadistico_proceso_api"
     command: ["bash", "/home/api/build.sh"]
     networks:
       - webnet
@@ -66,7 +65,6 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 3000
-      CONTAINER_NAME: "ut_hc_control_estadistico_proceso_client"
     command: ["bash", "/home/client/build.sh"]
     networks:
       - webnet
