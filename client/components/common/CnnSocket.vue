@@ -8,11 +8,11 @@ export default {
   },
 
   mounted() {
-    this.DATOS_SOCKET(this.$ws)
+    this.SOCKET(this.$ws)
   },
 
   methods: {
-    ...mapMutations(['DATOS_SOCKET'])
+    ...mapMutations(['SOCKET'])
   }
 }
 </script>

@@ -20,8 +20,16 @@
           <td class="text-xs-left">{{ props.item.username }}</td>
           <td class="text-xs-right">
             <div>
-              <v-icon color="blue" @click="editarUser(props.item)">edit</v-icon>
-              <v-icon color="pink" @click="eliminarUser(props.item)">delete</v-icon>
+              <v-icon
+                :disabled="props.item.username == 'admin'"
+                color="blue"
+                @click="editarUser(props.item)"
+              >edit</v-icon>
+              <v-icon
+                :disabled="props.item.username == 'admin'"
+                color="pink"
+                @click="eliminarUser(props.item)"
+              >delete</v-icon>
             </div>
           </td>
         </tr>

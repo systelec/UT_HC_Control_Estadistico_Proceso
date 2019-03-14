@@ -15,15 +15,23 @@
 
 const Ws = use('Ws');
 const Redis = use('Redis');
+const Alarma = use('App/Models/Alarma');
 
-Ws.channel('socket', async ({ socket }) => {
-  console.log('Se ha unido un usuario ID: %s', socket.id);
+try {
+  Ws.channel('socket', async ({ socket, auth }) => {
+    console.log('Se ha unido un usuario ID: %s', socket.id, 'Topic:', socket.topic);
 
-  try {
-    Redis.subscribe('datos_socket', async datos => {
-      socket.broadcastToAll('variables', datos);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
+    try {
+      // Cuento cantidad de alarmas sin reconocer y emito
+      const cantidadAlarmSinReconocer = await Alarma.query()
+        .where('reconocida', false)
+        .getCount();
+      await Redis.set('cantidad_alarmas_sin_reconocer', cantidadAlarmSinReconocer);
+      socket.broadcastToAll('cantidad_alarmas_sin_reconocer', cantidadAlarmSinReconocer);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+} catch (error) {
+  Ws.close();
+}

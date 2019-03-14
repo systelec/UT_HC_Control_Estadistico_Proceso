@@ -1,1 +1,0 @@
-command docker restart ut_hc_control_estadistico_proceso_client

@@ -154,7 +154,9 @@ export default {
           this.SET_MODAL_RELACIONAR_TECNOLOGIA_CON_MIXER(false)
         })
         .catch(error => {
-          this.alertError(error.response.data[0].message)
+          this.alertError(error.response.data.message || error.response.data.length > 0
+              ? error.response.data[0].message
+              : '')
         })
     }
   }

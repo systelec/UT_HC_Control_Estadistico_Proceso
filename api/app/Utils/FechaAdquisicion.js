@@ -5,16 +5,21 @@ const Redis = use('Redis');
 
 var FechaAdquisicion = {
   async arrayDesdeHasta() {
-    let hasta = moment();
-    let desde = await Redis.get('spc_desde');
+    let hasta = null;
+    let desde = await Redis.get('desde');
 
     if (!desde) {
-      desde = hasta.add(4, 'hours').format('YYYY-MM-DD HH:mm:ss');
+      desde = moment()
+        .add(-1, 'hours')
+        .format('YYYY-MM-DD HH:mm:ss');
     } else {
       desde = JSON.parse(desde);
     }
 
-    hasta = hasta.format('YYYY-MM-DD HH:mm:ss');
+    desde = moment(desde).format('YYYY-MM-DD HH:mm:ss');
+    hasta = moment()
+      .add(-3, 'hours')
+      .format('YYYY-MM-DD HH:mm:ss');
     return [desde, hasta];
   },
 

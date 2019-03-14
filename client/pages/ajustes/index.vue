@@ -51,13 +51,8 @@ export default {
   },
   data() {
     return {
-      componenteSeleccionado: 'General',
+      componenteSeleccionado: 'Usuario',
       items: [
-        {
-          icon: 'settings_applications',
-          title: 'Generales',
-          components: 'General'
-        },
         {
           icon: 'account_circle',
           title: 'Usuarios',

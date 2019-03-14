@@ -1,22 +1,40 @@
 <template>
   <v-layout row wrap pa-1 class="historico">
-    {{datosTendencia}}
-    <v-flex xs12 text-xs-left>
+    <v-flex xs6 text-xs-left>
       <div>
         <h3 v-if="tendenciaSeleccionada" class="titulo-tendencia">{{ tendenciaSeleccionada.tag }}</h3>
       </div>
     </v-flex>
+    <v-flex xs6 text-xs-right>
+      <div v-if="historicosAcumulados">
+        <v-btn
+          dark
+          small
+          :color="colorBotonCodigoProducto('Todos')"
+          @click="codigoProductoSelecionado = 'Todos'"
+        >Todos</v-btn>
+        <template v-for="producto in productosHistoricoFiltrado">
+          <v-btn
+            :key="producto"
+            dark
+            small
+            :color="colorBotonCodigoProducto(producto)"
+            @click="codigoProductoSelecionado = producto"
+          >{{producto}}</v-btn>
+        </template>
+      </div>
+    </v-flex>
     <v-flex xs12>
-      <div id="GraficoTendencia"></div>
+      <div id="GraficoTendenciaTiempoReal"></div>
     </v-flex>
   </v-layout>
 </template>
 
 <style scoped>
 .historico {
-  height: 80vh;
+  height: 86vh;
 }
-#GraficoTendencia {
+#GraficoTendenciaTiempoReal {
   width: 100%;
   height: 80vh;
 }
@@ -47,7 +65,9 @@ export default {
   data: () => ({
     chart: null,
     datosTendencia: null,
-    historicosAcumulados: [],
+    historicosAcumulados: null,
+    codigoProductoSelecionado: 'Todos',
+    productosHistoricoFiltrado: [],
     limite: {
       lh_1sigma: 0,
       ll_1sigma: 0,
@@ -71,13 +91,18 @@ export default {
       'datosSocket',
       'datosAcumuladosSocket',
       'historicos',
-      'aplicarFiltroTendencia'
+      'aplicarFiltroTendencia',
+      'modoTiempoReal'
     ])
   },
 
   watch: {
     datosSocket() {
-      if (this.tendenciaSeleccionada) {
+      if (
+        this.tendenciaSeleccionada &&
+        this.historicosAcumulados &&
+        this.modoTiempoReal
+      ) {
         this.datosTendencia = this.datosSocket.find(item => {
           if (
             parseInt(this.tendenciaSeleccionada.id) ===
@@ -97,6 +122,7 @@ export default {
         this.datosTendencia.limites.map(limite => {
           this.historicosAcumulados.limites.push(limite)
         })
+        this.agruparProductosHistoricos()
         this.graficarTendencias()
       }
     },
@@ -125,40 +151,54 @@ export default {
 
         // Concateno historicos con los historicos del socket
         this.historicosAcumulados = this.historicos
-        this.limite =
-          this.historicosAcumulados.limites.length > 0
-            ? this.historicosAcumulados.limites[
-                this.historicosAcumulados.limites.length - 1
-              ]
-            : {
-                lh_1sigma: 0,
-                ll_1sigma: 0,
-                lh_2sigma: 0,
-                ll_2sigma: 0,
-                lh_3sigma: 0,
-                ll_3sigma: 0,
-                usl: 0,
-                lsl: 0,
-                usl_rango: 0,
-                lsl_rango: 0,
-                media_historica: 0,
-                media_rango_historica: 0,
-                codigo_producto: null
-              }
 
+        if (this.historicosAcumulados) {
+          this.limite =
+            this.historicosAcumulados.limites.length > 0
+              ? this.historicosAcumulados.limites[
+                  this.historicosAcumulados.limites.length - 1
+                ]
+              : {
+                  lh_1sigma: 0,
+                  ll_1sigma: 0,
+                  lh_2sigma: 0,
+                  ll_2sigma: 0,
+                  lh_3sigma: 0,
+                  ll_3sigma: 0,
+                  usl: 0,
+                  lsl: 0,
+                  usl_rango: 0,
+                  lsl_rango: 0,
+                  media_historica: 0,
+                  media_rango_historica: 0,
+                  codigo_producto: null
+                }
+        }
+
+        this.agruparProductosHistoricos()
         this.graficarTendencias()
       }
+    },
+    codigoProductoSelecionado() {
+      this.graficarTendencias()
     }
-  },
-
-  async mounted() {
-    this.chart = echarts.init(document.getElementById('GraficoTendencia'))
   },
 
   methods: {
     ...mapMutations(['SET_PAYLOAD_HISTORICOS']),
     ...mapActions(['getAllHistoricos', 'getAllLimites']),
-    graficarTendencias(CodigoProducto) {
+    graficarTendencias() {
+      if (!this.chart) {
+        this.chart = echarts.init(
+          document.getElementById('GraficoTendenciaTiempoReal')
+        )
+      }
+
+      let producto = null
+      if (this.codigoProductoSelecionado === 'Todos') {
+        producto = this.colorBotonCodigoProducto
+      }
+
       let historicos = this.historicosAcumulados.historicos
       let media = this.limite.media_historica
       let mediaR = this.limite.media_rango_historica
@@ -175,36 +215,28 @@ export default {
       let LL3Sigma = this.limite.ll_3sigma
       let max = mathjs.round(this.limite.usl * 1.01, 2)
       let min = mathjs.round(this.limite.lsl * 0.99, 2)
-      let maxR = mathjs.round(this.limite.uslR * 1.01, 2)
-      let minR = mathjs.round(this.limite.lslR * 0.99, 2)
-      let intervalyAxis = mathjs.round((max - min) / 10, 2)
-      let intervalyAxisR = mathjs.round((maxR - minR) / 10, 2)
+      let maxR = mathjs.round(this.limite.usl_rango * 1.01, 2)
+      let minR = mathjs.round(this.limite.lsl_rango * 0.99, 2)
+      let intervalyAxis = mathjs.round((max - min) / 10, 3)
+      let intervalyAxisR = mathjs.round((maxR - minR) / 10, 3)
 
       let data = historicos.map(historico => {
         return moment(historico.fecha).format('YYYY-MM-DD HH:mm:ss')
       })
 
-      let valuesPV = historicos
-        .filter(historico => {
-          if (historico.pv) {
-            return true
-          }
-          return false
-        })
-        .map(historico => {
+      let valuesPV = historicos.map(historico => {
+        if (historico.pv) {
           return mathjs.round(historico.pv, 2)
-        })
+        }
+        return 0
+      })
 
-      let valuesSP = historicos
-        .filter(historico => {
-          if (historico.sp) {
-            return true
-          }
-          return false
-        })
-        .map(historico => {
+      let valuesSP = historicos.map(historico => {
+        if (historico.sp) {
           return mathjs.round(historico.sp, 2)
-        })
+        }
+        return 0
+      })
 
       let valuesRangos = valuesPV.map((item, i) => {
         if (i < valuesPV.length - 1) {
@@ -213,7 +245,7 @@ export default {
       })
 
       let valuesCodigoProductos = historicos.map(historico => {
-        return historico.CodigoProducto
+        return historico.codigo_producto
       })
 
       let markAreaCodigoProductos = data.filter((producto, i) => {
@@ -717,6 +749,16 @@ export default {
         return 10
       }
       return 15
+    },
+    agruparProductosHistoricos() {
+      const productosHistorico = _.groupBy(
+        this.historicosAcumulados.historicos,
+        'codigo_producto'
+      )
+      this.productosHistoricoFiltrado = []
+      for (const key in productosHistorico) {
+        this.productosHistoricoFiltrado.push(key)
+      }
     },
     colorBotonCodigoProducto(codigo) {
       if (this.codigoProductoSelecionado === codigo) {

@@ -10,6 +10,7 @@ const Redis = use('Redis');
 const _ = require('lodash');
 const moment = require('moment');
 const Database = use('Database');
+const Ws = use('Ws');
 
 module.exports = {
   async rapida() {
@@ -29,15 +30,16 @@ module.exports = {
       const tendenciasAgrupadas = _.groupBy(tendencias, 'tag_codigo_producto');
 
       // Traigo fecha actual y la ultima en que se ejecuto la actualizacion
-      await Redis.set('spc_desde', JSON.stringify('2019-03-01 00:00:00'));
+      // await Redis.set('desde', JSON.stringify('2019-03-01 12:00:00'));
       const fechas = await FechaAdquisicion.arrayDesdeHasta();
       const desde = fechas[0];
       const hasta = fechas[1];
+      console.log(fechas);
 
       // const desde = '2019-02-20 00:00:00';
       // const hasta = '2019-02-24 17:00:00';
       const arrayIteraciones = await FechaAdquisicion.arrayIteraciones(desde, hasta);
-
+      console.log(arrayIteraciones);
       for (let fecha of arrayIteraciones) {
         console.time('Adquisicio datos');
         console.log(fecha.desde, fecha.hasta);
@@ -147,7 +149,7 @@ module.exports = {
 
         // Guardo historicos en DB
         await Database.from('historicos').insert(historicosFormateado);
-        await Redis.set('spc_desde', JSON.stringify(fecha.hasta));
+        await Redis.set('desde', JSON.stringify(fecha.hasta));
 
         // Formateo datos para emitir por socket
         const datos = await FormateaDatos.sockets(
@@ -158,8 +160,15 @@ module.exports = {
           fecha.hasta
         );
 
-        // Guardo en memoria y publico socket
-        Redis.publish('datos_socket', JSON.stringify(datos));
+        // Emito por socket a todos los usuarios
+        try {
+          Ws.getChannel('socket')
+            .topic('socket')
+            .broadcastToAll('variables', JSON.stringify(datos));
+        } catch (error) {
+          console.log('No hay usuarios subcriptos al socket');
+        }
+
         console.timeEnd('Adquisicio datos');
       }
 

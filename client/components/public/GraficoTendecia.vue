@@ -96,25 +96,25 @@ export default {
   },
 
   watch: {
-    limites() {
-      this.filtraLimite()
-    },
-    historicos() {
-      this.agruparProductosHistoricos()
-      this.graficarTendencias()
-    },
-    codigoProductoSelecionado() {
-      this.agruparProductosHistoricos()
-      this.graficarTendencias()
-    }
+    // limites() {
+    //   this.filtraLimite()
+    // },
+    // historicos() {
+    //   this.agruparProductosHistoricos()
+    //   this.graficarTendencias()
+    // },
+    // codigoProductoSelecionado() {
+    //   this.agruparProductosHistoricos()
+    //   this.graficarTendencias()
+    // }
   },
 
   async mounted() {
-    this.chart = echarts.init(document.getElementById('GraficoTendencia'))
-    await this.getAllHistoricos()
-    await this.getAllLimites()
-    this.agruparProductosHistoricos()
-    this.graficarTendencias()
+    // this.chart = echarts.init(document.getElementById('GraficoTendencia'))
+    // await this.getAllHistoricos()
+    // await this.getAllLimites()
+    // this.agruparProductosHistoricos()
+    // this.graficarTendencias()
   },
 
   methods: {

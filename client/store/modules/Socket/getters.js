@@ -4,6 +4,9 @@ const getters = {
   },
   datosAcumuladosSocket(state) {
     return state.datosAcumuladosSocket
+  },
+  alarmasSinReconocerSocket(state) {
+    return state.alarmasSinReconocerSocket
   }
 }
 

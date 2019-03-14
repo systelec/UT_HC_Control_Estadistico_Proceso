@@ -197,7 +197,9 @@ export default {
           this.alertSuccess()
         })
         .catch(error => {
-          this.alertError(error.response.data[0].message)
+          this.alertError(error.response.data.message || error.response.data.length > 0
+              ? error.response.data[0].message
+              : '')
         })
     },
     cambiarTag(item) {
@@ -207,7 +209,9 @@ export default {
           this.alertSuccess()
         })
         .catch(error => {
-          this.alertError(error.response.data[0].message)
+          this.alertError(error.response.data.message || error.response.data.length > 0
+              ? error.response.data[0].message
+              : '')
         })
     }
   }

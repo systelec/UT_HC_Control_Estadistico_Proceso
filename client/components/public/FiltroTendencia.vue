@@ -9,8 +9,9 @@
     v-model="close"
     full-width
   >
-    <v-btn :loading="loading" icon small flat slot="activator">
+    <v-btn :loading="loading" small flat slot="activator">
       <v-icon>filter_list</v-icon>
+      <span class="ml-2">filtro</span>
     </v-btn>
     <v-card width="1000">
       <v-card-actions>
@@ -347,6 +348,8 @@ export default {
       this.SET_TENDENCIA_SELECCIONADA(this.tendenciaSeleccionada)
       if (this.modoTiempoReal) {
         this.SET_APLICAR_FILTRO_TENDENCIA()
+        this.loading = false
+        this.close = false
       } else {
         if (this.dateFrom && this.timeFrom && this.dateTo && this.timeTo) {
           this.loading = true
@@ -375,6 +378,7 @@ export default {
 
           await this.getAllHistoricos()
           await this.getAllLimites()
+          this.SET_APLICAR_FILTRO_TENDENCIA()
           this.loading = false
           this.close = false
         } else {

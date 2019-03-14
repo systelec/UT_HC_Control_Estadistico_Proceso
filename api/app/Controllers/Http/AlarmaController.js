@@ -1,93 +1,57 @@
-'use strict'
+'use strict';
 
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
+const Alarma = use('App/Models/Alarma');
+const Ws = use('Ws');
+const Redis = use('Redis');
 
-/**
- * Resourceful controller for interacting with alarmas
- */
 class AlarmaController {
-  /**
-   * Show a list of all alarmas.
-   * GET alarmas
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
+  async index({ request, response }) {
+    let { page, sortBy, descending, perPage, search, searchField } = request.get();
+    page = page || 1;
+    sortBy = sortBy || 'created_at';
+    descending = descending || 'DESC';
+    perPage = perPage || 10;
+    searchField = searchField || 'descripcion';
+    search = search || '';
+
+    const alarmas = await Alarma.query()
+      .with('tendencia')
+      .orderBy(sortBy, descending)
+      .where(searchField, 'like', `%${search}%`)
+      .paginate(page, perPage);
+
+    response.status(200).json(alarmas);
   }
 
-  /**
-   * Render a form to be used for creating a new alarma.
-   * GET alarmas/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
+  async reconocer({ request, response, params: { id } }) {
+    const data = request.only(['detalle']);
+    const alarma = await Alarma.find(id);
 
-  /**
-   * Create/save a new alarma.
-   * POST alarmas
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response }) {
-  }
+    if (!alarma) {
+      response.status(404).json({
+        message: 'Alarma no encontrada.',
+        id
+      });
+      return;
+    }
+    alarma.reconocida = true;
+    alarma.detalle = data.detalle || alarma.detalle;
 
-  /**
-   * Display a single alarma.
-   * GET alarmas/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
-  }
+    const cantidadAlarmSinReconocer = await Redis.get('cantidad_alarmas_sin_reconocer');
+    await Redis.set('cantidad_alarmas_sin_reconocer', cantidadAlarmSinReconocer - 1);
 
-  /**
-   * Render a form to update an existing alarma.
-   * GET alarmas/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
+    try {
+      Ws.getChannel('socket')
+        .topic('socket')
+        .broadcastToAll('cantidad_alarmas_sin_reconocer', cantidadAlarmSinReconocer - 1);
+    } catch (error) {
+      console.log('No hay usuarios subcriptos al socket');
+    }
 
-  /**
-   * Update alarma details.
-   * PUT or PATCH alarmas/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
-  }
+    await alarma.save();
 
-  /**
-   * Delete a alarma with id.
-   * DELETE alarmas/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
+    response.status(200).json(alarma);
   }
 }
 
-module.exports = AlarmaController
+module.exports = AlarmaController;

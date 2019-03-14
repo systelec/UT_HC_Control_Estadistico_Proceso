@@ -1,6 +1,7 @@
 const state = {
   datosSocket: [],
-  datosAcumuladosSocket: []
+  datosAcumuladosSocket: [],
+  alarmasSinReconocerSocket: 0
 }
 
 export default state

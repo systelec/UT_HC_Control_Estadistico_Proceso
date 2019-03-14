@@ -4,7 +4,7 @@
       <v-flex xs3 offset-xs9>
         <buscador
           :state="'Alarmas'"
-          :campos="[{text: 'Tag', value: 'tag'} ,{text: 'Nombre', value: 'nombre'} , {text: 'Descripcion', value: 'descripcion'} ]"
+          :campos="[{text: 'Descripcion', value: 'descripcion'} ,{text: 'Codigo producto', value: 'codigo_producto'} ]"
         />
       </v-flex>
       <v-flex xs12>

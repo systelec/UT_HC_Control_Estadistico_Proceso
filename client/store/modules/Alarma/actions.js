@@ -34,6 +34,18 @@ const actions = {
       })
   },
 
+  async ackAlarma(context, alarma) {
+    await axios
+      .put(`alarmas/${this.state.Alarma.alarma.id}/reconocer`, alarma)
+      .then(response => {
+        context.dispatch('getAllAlarmas')
+        return Promise.resolve(response.data)
+      })
+      .catch(error => {
+        return Promise.reject(error)
+      })
+  },
+
   async deleteAlarma(context) {
     await axios
       .delete(`alarmas/${this.state.Alarma.alarma.id}`)

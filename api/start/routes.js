@@ -114,3 +114,7 @@ Route.put('api/v1/destinatarios/:id', 'DestinatarioController.update').validator
   'Destinatario/UpdateDestinatario'
 );
 Route.delete('api/v1/destinatarios/:id', 'DestinatarioController.destroy');
+
+// Alarmas
+Route.get('api/v1/alarmas', 'AlarmaController.index');
+Route.put('api/v1/alarmas/:id/reconocer', 'AlarmaController.reconocer');

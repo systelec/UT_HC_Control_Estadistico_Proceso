@@ -6,8 +6,8 @@
       </v-flex>
       <v-flex xs12 class="mt-2">
         <v-card class="elevation-0" style="height: 100%;">
-          <grafico-tendecia v-if="!modoTiempoReal"/>
-          <grafico-tendecia-tiempo-real v-if="modoTiempoReal"/>
+          <!-- <grafico-tendecia/> -->
+          <grafico-tendecia-tiempo-real/>
         </v-card>
       </v-flex>
     </v-layout>

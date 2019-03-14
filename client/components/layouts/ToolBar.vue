@@ -19,8 +19,8 @@
       <v-btn icon small to="/tv">
         <v-icon>tv</v-icon>
       </v-btn>
-      <v-badge v-model="notificacionAlarmas" color="red">
-        <span slot="badge" style="font-size: 10px;">{{ cantidadAlarmas }}</span>
+      <v-badge v-model="notificacionAlarmas" overlap color="red">
+        <span slot="badge" style="font-size: 10px;">{{ alarmasSinReconocerSocket }}</span>
         <v-btn icon small to="/alarmas" style="margin-top: -10px; margin-bottom: -10px;">
           <v-icon>notifications_active</v-icon>
         </v-btn>
@@ -59,15 +59,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import Clock from '@/components/common/widgets/Clock'
 export default {
   components: {
     Clock
   },
+
   data() {
     return {
       notificacionAlarmas: false,
-      cantidadAlarmas: 0,
       items: [{ title: 'Tendencias', to: '/', icon: 'timeline' }],
       itemsSettings: [
         {
@@ -83,6 +84,21 @@ export default {
       ]
     }
   },
+
+  watch: {
+    alarmasSinReconocerSocket() {
+      if (parseInt(this.alarmasSinReconocerSocket) > 0) {
+        this.notificacionAlarmas = true
+      } else {
+        this.notificacionAlarmas = false
+      }
+    }
+  },
+
+  computed: {
+    ...mapGetters(['alarmasSinReconocerSocket'])
+  },
+
   methods: {
     handleFullScreen() {
       let doc = window.document

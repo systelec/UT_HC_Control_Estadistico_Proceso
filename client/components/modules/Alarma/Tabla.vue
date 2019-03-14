@@ -15,39 +15,53 @@
       <template slot="items" slot-scope="props">
         <tr>
           <td class="text-xs-left">
-            <strong class="blue-grey--text ml-3">{{ props.item.descripcion }}</strong>
+            <strong class="blue-grey--text ml-3">{{ props.item.created_at }}</strong>
           </td>
+          <td class="text-xs-left">{{ props.item.descripcion }}</td>
           <td class="text-xs-left">{{ props.item.codigo_producto }}</td>
-          <td class="text-xs-left">{{ props.item.prioridad }}</td>
+          <td class="text-xs-left">{{ props.item.tendencia.tag }}</td>
+          <td class="text-xs-left">{{ props.item.updated_at }}</td>
+          <td class="text-xs-left">{{ props.item.detalle }}</td>
+          <td class="text-xs-left">{{ props.item.usuario }}</td>
           <td class="text-xs-right">
             <div>
-              <v-icon color="blue" @click="editarAlarma(props.item)">edit</v-icon>
-              <v-icon color="pink" @click="eliminarAlarma(props.item)">delete</v-icon>
+              <v-icon
+                :disabled="props.item.reconocida"
+                color="red"
+                @click="reconocerAlarma(props.item)"
+              >{{props.item.reconocida ? 'alarm_on' : 'alarm'}}</v-icon>
             </div>
           </td>
         </tr>
       </template>
     </v-data-table>
-    <alarma-eliminar v-if="modalEliminarAlarma"/>
-    <alarma-editar v-if="modalEditarAlarma"/>
+    <alarma-reconocer v-if="modalReconocerAlarma"/>
   </v-card>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import AlarmaEliminar from '@/components/modules/Alarma/Eliminar'
-import AlarmaEditar from '@/components/modules/Alarma/Editar'
+import AlarmaReconocer from '@/components/modules/Alarma/Reconocer'
 export default {
   components: {
-    AlarmaEliminar,
-    AlarmaEditar
+    AlarmaReconocer
   },
 
   data() {
     return {
       headers: [
-        { text: 'Codigo', value: 'codigo', align: 'left' },
+        { text: 'Fecha', value: 'created_at', align: 'left' },
         { text: 'Descripcion', value: 'descripcion', align: 'left' },
+        { text: 'Codigo producto', value: 'codigo_producto', align: 'left' },
+        {
+          text: 'Tendencia',
+          value: 'tendencia',
+          align: 'left',
+          sortable: false
+        },
+        { text: 'Reconocida', value: 'updated_at', align: 'left' },
+        { text: 'Detalle', value: 'detalle', align: 'left' },
+        { text: 'Usuario', value: 'usuario', align: 'left' },
         { text: '', value: '', sortable: false }
       ],
       items: [],
@@ -67,20 +81,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters([
-      'alarmas',
-      'payloadAlarmas',
-      'modalEditarAlarma',
-      'modalEliminarAlarma'
-    ])
+    ...mapGetters(['alarmas', 'payloadAlarmas', 'modalReconocerAlarma'])
   },
 
   methods: {
     ...mapMutations([
       'SET_ALARMA',
       'SET_PAYLOAD_ALARMAS',
-      'SET_MODAL_EDITAR_ALARMA',
-      'SET_MODAL_ELIMINAR_ALARMA'
+      'SET_MODAL_RECONOCER_ALARMA'
     ]),
     ...mapActions(['getAllAlarmas']),
     async getAlarmas() {
@@ -113,16 +121,9 @@ export default {
       this.search = ''
       this.getAlarmas()
     },
-    agregarAlarma() {
-      this.SET_MODAL_AGREGAR_ALARMA(true)
-    },
-    editarAlarma(item) {
+    reconocerAlarma(item) {
       this.SET_ALARMA(item)
-      this.SET_MODAL_EDITAR_ALARMA(true)
-    },
-    eliminarAlarma(item) {
-      this.SET_ALARMA(item)
-      this.SET_MODAL_ELIMINAR_ALARMA(true)
+      this.SET_MODAL_RECONOCER_ALARMA(true)
     }
   }
 }
