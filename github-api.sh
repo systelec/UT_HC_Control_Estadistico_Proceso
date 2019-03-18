@@ -20,6 +20,7 @@ function apigithub()
 		if [ $sha != $sha_old ] && [ $length_type_commit -lt 7 ]; then
 
 			if [ $type_commit = "BUILD" ]; then 
+				command git pull
 				command bash ./api/restart.sh
 				command bash ./client/restart.sh
 				command bash ./data/restart.sh
