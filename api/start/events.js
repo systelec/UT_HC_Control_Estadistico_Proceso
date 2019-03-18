@@ -8,7 +8,7 @@ cyclicEvent();
 async function cyclicEvent() {
   try {
     setTimeout(async () => {
-      // await AdquisicionDatos.rapida();
+      await AdquisicionDatos.rapida();
       cyclicEvent();
     }, 60000);
 
