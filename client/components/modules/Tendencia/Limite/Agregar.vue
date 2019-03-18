@@ -14,6 +14,27 @@
         <v-card-text>
           <v-form v-model="valid">
             <v-layout row wrap>
+               <v-flex xs3 pt-4>
+                <span>Codigo de producto</span>
+              </v-flex>
+              <v-flex xs4>
+                <v-text-field
+                  ref="codigo_producto"
+                  v-model="codigo_producto"
+                  label="Codigo de producto"
+                  placeholder="671235025"
+                  required
+                ></v-text-field>
+              </v-flex>
+              <v-flex xs4>
+                <v-btn small flat dark color="blue" class="mt-3" @click="generarConHistoricos()">
+                  <v-icon>history</v-icon>
+                  <span class="ml-2">Generar con historicos</span>
+                </v-btn>
+              </v-flex>
+              <v-flex xs12>
+                <v-divider/>
+              </v-flex>
               <v-flex xs3 pt-4>
                 <span>1 Sigma</span>
               </v-flex>
@@ -191,10 +212,12 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import notify from '@/mixins/notify'
+import axios from '@/plugins/axios'
 export default {
   data() {
     return {
       valid: false,
+      codigo_producto: null,
       limiteAgregar: {
         lh_1sigma: null,
         ll_1sigma: null,
@@ -266,6 +289,16 @@ export default {
               : '')
           })
       }
+    },
+    async generarConHistoricos() {
+      await axios
+        .post('limites/historicos', {
+          tendencia: this.tendencia.id,
+          codigo_producto: this.codigo_producto
+        })
+        .then(response => {
+          this.limiteAgregar = response.data
+        })
     }
   }
 }

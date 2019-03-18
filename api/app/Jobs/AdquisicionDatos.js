@@ -30,16 +30,14 @@ module.exports = {
       const tendenciasAgrupadas = _.groupBy(tendencias, 'tag_codigo_producto');
 
       // Traigo fecha actual y la ultima en que se ejecuto la actualizacion
-      // await Redis.set('desde', JSON.stringify('2019-03-01 12:00:00'));
+      // await Redis.set('desde', JSON.stringify('2019-03-17 07:00:00'));
       const fechas = await FechaAdquisicion.arrayDesdeHasta();
       const desde = fechas[0];
       const hasta = fechas[1];
-      console.log(fechas);
-
+      
       // const desde = '2019-02-20 00:00:00';
       // const hasta = '2019-02-24 17:00:00';
       const arrayIteraciones = await FechaAdquisicion.arrayIteraciones(desde, hasta);
-      console.log(arrayIteraciones);
       for (let fecha of arrayIteraciones) {
         console.time('Adquisicio datos');
         console.log(fecha.desde, fecha.hasta);

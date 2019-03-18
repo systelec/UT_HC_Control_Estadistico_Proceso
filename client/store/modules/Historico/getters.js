@@ -5,6 +5,9 @@ const getters = {
   historicos(state) {
     return state.historicos
   },
+  historicosFiltradosPorProducto(state) {
+    return state.historicosFiltradosPorProducto
+  },
   tendenciaHistorico(state) {
     return state.tendenciaHistorico
   },

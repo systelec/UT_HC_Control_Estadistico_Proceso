@@ -3,6 +3,7 @@ import moment from 'moment'
 const state = {
   historico: null,
   historicos: null,
+  historicosFiltradosPorProducto: [],
   tendenciaHistorico: {
     tag: 'Dosif_LAS'
   },

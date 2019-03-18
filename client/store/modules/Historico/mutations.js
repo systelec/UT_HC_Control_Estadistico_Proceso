@@ -1,5 +1,7 @@
 export const SET_HISTORICO = 'SET_HISTORICO'
 export const SET_HISTORICOS = 'SET_HISTORICOS'
+export const SET_HISTORICOS_FILTRADOS_POR_PRODUCTO =
+  'SET_HISTORICOS_FILTRADOS_POR_PRODUCTO'
 export const SET_TENDENCIA_HISTORICO = 'SET_TENDENCIA_HISTORICO'
 export const SET_PRODUCTOS_HISTORICO = 'SET_PRODUCTOS_HISTORICO'
 export const SET_MODAL_AGREGAR_HISTORICO = 'SET_MODAL_AGREGAR_HISTORICO'
@@ -16,6 +18,12 @@ const mutations = {
   },
   [SET_HISTORICOS](state, historicos) {
     state.historicos = historicos
+  },
+  [SET_HISTORICOS_FILTRADOS_POR_PRODUCTO](
+    state,
+    historicosFiltradosPorProducto
+  ) {
+    state.historicosFiltradosPorProducto = historicosFiltradosPorProducto
   },
   [SET_TENDENCIA_HISTORICO](state, tendencias) {
     state.tendenciaHistorico = tendencias

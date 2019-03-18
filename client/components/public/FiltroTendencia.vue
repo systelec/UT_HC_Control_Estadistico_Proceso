@@ -346,44 +346,55 @@ export default {
     async filtrarTendecia() {
       this.SET_MODO_TIEMPO_REAL(this.modoTiempoReal)
       this.SET_TENDENCIA_SELECCIONADA(this.tendenciaSeleccionada)
-      if (this.modoTiempoReal) {
+      if (this.dateFrom && this.timeFrom && this.dateTo && this.timeTo) {
+        this.loading = true
+
+        const productos = this.productosSeleccionado
+        let desde = null
+        let hasta = null
+
+        if (this.modoTiempoReal) {
+          desde = moment().add(-7, 'days').format(
+            'YYYY-MM-DD HH:mm:ss'
+          )
+          hasta = moment().format(
+            'YYYY-MM-DD HH:mm:ss'
+          )
+        } else {
+          desde = moment(this.dateFrom + ' ' + this.timeFrom).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )
+          hasta = moment(this.dateTo + ' ' + this.timeTo).format(
+            'YYYY-MM-DD HH:mm:ss'
+          )
+        }
+
+        const payload = {
+          params: {
+            tendencia: this.tendenciaSeleccionada.id,
+            desde: desde,
+            hasta: hasta,
+            productos: productos
+          }
+        }
+        this.SET_PAYLOAD_HISTORICOS(payload)
+
+        const payloadLimites = {
+          params: {
+            tendencia: this.tendenciaSeleccionada.id,
+            desde: desde,
+            hasta: hasta,
+            productos: productos
+          }
+        }
+        this.SET_PAYLOAD_LIMITES(payloadLimites)
+
+        await this.getAllHistoricos()
         this.SET_APLICAR_FILTRO_TENDENCIA()
         this.loading = false
         this.close = false
       } else {
-        if (this.dateFrom && this.timeFrom && this.dateTo && this.timeTo) {
-          this.loading = true
-
-          const productos = this.productosSeleccionado
-
-          const payload = {
-            params: {
-              tendencia: this.tendenciaSeleccionada.id,
-              desde: new Date(this.dateFrom + ' ' + this.timeFrom),
-              hasta: new Date(this.dateTo + ' ' + this.timeTo),
-              productos: productos
-            }
-          }
-          this.SET_PAYLOAD_HISTORICOS(payload)
-
-          const payloadLimites = {
-            params: {
-              tendencia: this.tendenciaSeleccionada.id,
-              desde: new Date(this.dateFrom + ' ' + this.timeFrom),
-              hasta: new Date(this.dateTo + ' ' + this.timeTo),
-              productos: productos
-            }
-          }
-          this.SET_PAYLOAD_LIMITES(payloadLimites)
-
-          await this.getAllHistoricos()
-          await this.getAllLimites()
-          this.SET_APLICAR_FILTRO_TENDENCIA()
-          this.loading = false
-          this.close = false
-        } else {
-          this.valid = 'Faltan seleccionar elementos del filtro'
-        }
+        this.valid = 'Faltan seleccionar elementos del filtro'
       }
     },
     getTendencias() {

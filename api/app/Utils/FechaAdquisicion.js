@@ -18,7 +18,6 @@ var FechaAdquisicion = {
 
     desde = moment(desde).format('YYYY-MM-DD HH:mm:ss');
     hasta = moment()
-      .add(-3, 'hours')
       .format('YYYY-MM-DD HH:mm:ss');
     return [desde, hasta];
   },

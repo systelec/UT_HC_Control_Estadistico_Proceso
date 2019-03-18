@@ -81,7 +81,7 @@ Route.get('api/v1/limites/:id', 'LimiteController.show');
 Route.post('api/v1/limites', 'LimiteController.store').validator('Limite/StoreLimite');
 Route.put('api/v1/limites/:id', 'LimiteController.update').validator('Limite/UpdateLimite');
 Route.delete('api/v1/limites/:id', 'LimiteController.destroy');
-Route.get('api/v1/limites/:id/historicos', 'LimiteController.indexHistoricos');
+Route.post('api/v1/limites/historicos', 'LimiteController.limiteByHistoricos');
 
 // Historicos
 Route.get('api/v1/historicos', 'HistoricoController.index');

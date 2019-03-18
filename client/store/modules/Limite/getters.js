@@ -5,6 +5,9 @@ const getters = {
   limites(state) {
     return state.limites
   },
+  limiteFiltradoPorProducto(state) {
+    return state.limiteFiltradoPorProducto
+  },
   modalAgregarLimite(state) {
     return state.modalAgregarLimite
   },

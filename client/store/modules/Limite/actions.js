@@ -9,7 +9,7 @@ const actions = {
         context.commit(SET_LIMITES, response.data)
       })
   },
-
+  
   async createLimite(context, limite) {
     await axios
       .post('limites', limite)

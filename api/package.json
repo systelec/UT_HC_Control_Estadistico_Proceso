@@ -31,6 +31,7 @@
     "cron": "^1.6.0",
     "eslint-plugin-jsx-a11y": "^6.2.0",
     "lodash": "^4.17.11",
+    "mathjs": "^5.7.0",
     "moment": "^2.24.0",
     "mssql": "4.1.0",
     "pg": "^7.8.1",

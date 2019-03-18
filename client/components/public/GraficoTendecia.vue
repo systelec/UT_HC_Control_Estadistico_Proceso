@@ -1,15 +1,10 @@
 <template>
   <v-layout row wrap pa-1 class="historico">
     <v-flex xs6 text-xs-left>
-      <div>
-        <h3
-          v-if="tendenciaHistorico"
-          class="titulo-tendencia"
-        >{{ tendenciaHistorico.tag }} ( {{productosHistorico}} )</h3>
-      </div>
+      <h2 v-if="tendenciaSeleccionada" class="titulo-tendencia">{{ tendenciaSeleccionada.tag }}</h2>
     </v-flex>
     <v-flex xs6 text-xs-right>
-      <div v-if="historicos.length > 0">
+      <div v-if="historicosAcumulados">
         <v-btn
           dark
           small
@@ -28,16 +23,13 @@
       </div>
     </v-flex>
     <v-flex xs12>
-      <div id="GraficoTendencia"></div>
+      <div id="GraficoTendenciaTiempoReal"></div>
     </v-flex>
   </v-layout>
 </template>
 
 <style scoped>
-.historico {
-  height: 80vh;
-}
-#GraficoTendencia {
+#GraficoTendenciaTiempoReal {
   width: 100%;
   height: 80vh;
 }
@@ -62,10 +54,14 @@ import ecStat from 'echarts-stat'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import mathjs from 'mathjs'
 import _ from 'lodash'
+import axios from '@/plugins/axios'
+import jStat from 'jStat'
 
 export default {
   data: () => ({
     chart: null,
+    datosTendencia: null,
+    historicosAcumulados: null,
     codigoProductoSelecionado: 'Todos',
     productosHistoricoFiltrado: [],
     limite: {
@@ -87,40 +83,155 @@ export default {
 
   computed: {
     ...mapGetters([
+      'tendenciaSeleccionada',
       'datosSocket',
+      'datosAcumuladosSocket',
       'historicos',
-      'limites',
-      'tendenciaHistorico',
-      'productosHistorico'
+      'aplicarFiltroTendencia',
+      'modoTiempoReal'
     ])
   },
 
   watch: {
-    // limites() {
-    //   this.filtraLimite()
-    // },
-    // historicos() {
-    //   this.agruparProductosHistoricos()
-    //   this.graficarTendencias()
-    // },
-    // codigoProductoSelecionado() {
-    //   this.agruparProductosHistoricos()
-    //   this.graficarTendencias()
-    // }
-  },
+    datosSocket() {
+      if (
+        this.tendenciaSeleccionada &&
+        this.historicosAcumulados &&
+        this.modoTiempoReal
+      ) {
+        this.datosTendencia = this.datosSocket.find(item => {
+          if (
+            parseInt(this.tendenciaSeleccionada.id) ===
+            parseInt(item.tendencia.id)
+          ) {
+            return true
+          }
+        })
 
-  async mounted() {
-    // this.chart = echarts.init(document.getElementById('GraficoTendencia'))
-    // await this.getAllHistoricos()
-    // await this.getAllLimites()
-    // this.agruparProductosHistoricos()
-    // this.graficarTendencias()
+        this.historicosAcumulados.hasta = this.datosTendencia.hasta
+        this.historicosAcumulados.producto = this.datosTendencia.producto
+        this.historicosAcumulados.tendencia = this.datosTendencia.tendencia
+
+        this.datosTendencia.historicos.map(historico => {
+          this.historicosAcumulados.historicos.push(historico)
+        })
+        this.datosTendencia.limites.map(limite => {
+          this.historicosAcumulados.limites.push(limite)
+        })
+        this.agruparProductosHistoricos()
+        this.graficarTendencias()
+      }
+    },
+    async aplicarFiltroTendencia() {
+      if (this.tendenciaSeleccionada) {
+        // Busco tendencia seleccionada de datos del socket
+        this.datosTendencia = this.datosSocket.find(item => {
+          if (
+            parseInt(this.tendenciaSeleccionada.id) ===
+            parseInt(item.tendencia.id)
+          ) {
+            return true
+          }
+        })
+      
+
+        // Concateno historicos con los historicos del socket
+        this.historicosAcumulados = this.historicos
+
+        if (this.historicosAcumulados) {
+          this.limite =
+            this.historicosAcumulados.limites.length > 0
+              ? this.historicosAcumulados.limites[
+                  this.historicosAcumulados.limites.length - 1
+                ]
+              : {
+                  lh_1sigma: 0,
+                  ll_1sigma: 0,
+                  lh_2sigma: 0,
+                  ll_2sigma: 0,
+                  lh_3sigma: 0,
+                  ll_3sigma: 0,
+                  usl: 0,
+                  lsl: 0,
+                  usl_rango: 0,
+                  lsl_rango: 0,
+                  media_historica: 0,
+                  media_rango_historica: 0,
+                  codigo_producto: null
+                }
+        }
+
+        this.agruparProductosHistoricos()
+        this.graficarTendencias()
+      }
+    },
+    codigoProductoSelecionado() {
+      this.graficarTendencias()
+    }
   },
 
   methods: {
-    ...mapMutations([]),
+    ...mapMutations([
+      'SET_PAYLOAD_HISTORICOS',
+      'SET_HISTORICOS_FILTRADOS_POR_PRODUCTO',
+      'SET_LIMITE_FILTRADO_POR_PRODUCTO'
+    ]),
     ...mapActions(['getAllHistoricos', 'getAllLimites']),
-    graficarTendencias(CodigoProducto) {
+    graficarTendencias() {
+      if (!this.chart) {
+        this.chart = echarts.init(
+          document.getElementById('GraficoTendenciaTiempoReal')
+        )
+      }
+
+      let producto = null
+      if (this.codigoProductoSelecionado !== 'Todos') {
+        producto = this.codigoProductoSelecionado
+      }
+
+      let historicos = this.historicosAcumulados.historicos.filter(
+        historico => {
+          if (!producto) {
+            return true
+          } else {
+            if (parseInt(historico.codigo_producto) === parseInt(producto)) {
+              return true
+            }
+            return false
+          }
+        }
+      )
+      if (historicos.length > 0) {
+        const limite = this.historicosAcumulados.limites
+          .sort((a, b) => {
+            if (a.created_at < b.created_at) {
+              return 1
+            }
+            if (a.created_at > b.created_at) {
+              return -1
+            }
+            return 0
+          })
+          .find(limite => {
+            const fechaLimite = moment(limite.created_at).add(-3, 'hours')
+            const fechaHistorico = moment(
+              historicos[historicos.length - 1].fecha
+            ).add(3, 'hours')
+
+            const diff = fechaLimite.diff(fechaHistorico, 'seconds')
+
+            if (diff <= 0) {
+              return true
+            }
+          })
+
+        if (limite) {
+          this.limite = limite
+        }
+      }
+      this.SET_HISTORICOS_FILTRADOS_POR_PRODUCTO(historicos)
+      this.SET_LIMITE_FILTRADO_POR_PRODUCTO(this.limite)
+
       let media = this.limite.media_historica
       let mediaR = this.limite.media_rango_historica
       let lsl = this.limite.lsl
@@ -136,57 +247,28 @@ export default {
       let LL3Sigma = this.limite.ll_3sigma
       let max = mathjs.round(this.limite.usl * 1.01, 2)
       let min = mathjs.round(this.limite.lsl * 0.99, 2)
-      let maxR = mathjs.round(this.limite.uslR * 1.01, 2)
-      let minR = mathjs.round(this.limite.lslR * 0.99, 2)
-      let intervalyAxis = mathjs.round((max - min) / 10, 2)
-      let intervalyAxisR = mathjs.round((maxR - minR) / 10, 2)
-
-      let hasta = moment(
-        this.historicos.length > 0
-          ? this.historicos[this.historicos.length - 1].fecha
-          : ''
-      )
-      let desde = moment(
-        this.historicos.length > 0 ? this.historicos[0].fecha : ''
-      )
-
-      let historicos = this.historicos
-      if (this.codigoProductoSelecionado !== 'Todos') {
-        historicos = this.historicos.filter(historico => {
-          if (
-            parseInt(historico.codigo_producto) ===
-            parseInt(this.codigoProductoSelecionado)
-          ) {
-            return true
-          }
-        })
-      }
+      let maxR = mathjs.round(this.limite.usl_rango * 1.01, 2)
+      let minR = mathjs.round(this.limite.lsl_rango * 0.99, 2)
+      let intervalyAxis = mathjs.round((max - min) / 10, 3)
+      let intervalyAxisR = mathjs.round((maxR - minR) / 10, 3)
 
       let data = historicos.map(historico => {
         return moment(historico.fecha).format('YYYY-MM-DD HH:mm:ss')
       })
 
-      let valuesPV = historicos
-        .filter(historico => {
-          if (historico.pv) {
-            return true
-          }
-          return false
-        })
-        .map(historico => {
+      let valuesPV = historicos.map(historico => {
+        if (historico.pv) {
           return mathjs.round(historico.pv, 2)
-        })
+        }
+        return 0
+      })
 
-      let valuesSP = historicos
-        .filter(historico => {
-          if (historico.sp) {
-            return true
-          }
-          return false
-        })
-        .map(historico => {
+      let valuesSP = historicos.map(historico => {
+        if (historico.sp) {
           return mathjs.round(historico.sp, 2)
-        })
+        }
+        return 0
+      })
 
       let valuesRangos = valuesPV.map((item, i) => {
         if (i < valuesPV.length - 1) {
@@ -195,7 +277,7 @@ export default {
       })
 
       let valuesCodigoProductos = historicos.map(historico => {
-        return historico.CodigoProducto
+        return historico.codigo_producto
       })
 
       let markAreaCodigoProductos = data.filter((producto, i) => {
@@ -228,22 +310,12 @@ export default {
 
       let histogramaCategory = []
       let histogramaValues = []
-      let distribucionNormalValues = []
       let interaciones = this.numeroClase(valuesPV.length)
       let intervaloCategorias = (max - min) / interaciones
       let j = 0
       let categoria = min
       let cantidad
-      let mediaDN = 0
-      let stdDN = 0
 
-      if (valuesPV.length > 3) {
-        mediaDN =
-          valuesPV.reduce((a, b) => {
-            return a + b
-          }) / valuesPV.length
-        stdDN = mathjs.std(valuesPV)
-      }
       for (j; j < interaciones; j++) {
         cantidad = valuesPV.filter(item => {
           if (item > categoria && item < categoria + intervaloCategorias) {
@@ -251,15 +323,21 @@ export default {
           }
           return false
         })
-        let x = cantidad.length
-        let valorND = this.normalDist(mediaDN, stdDN, cantidad.length)
 
         histogramaCategory.push(mathjs.round(categoria, 2))
         histogramaValues.push(cantidad.length)
-        distribucionNormalValues.push(valorND)
 
         categoria = categoria + intervaloCategorias
       }
+
+      var mean = jStat.mean(valuesPV)
+      var stdev = jStat.stdev(valuesPV)
+      var min_ = jStat.min(valuesPV)
+      var max_ = jStat.max(valuesPV)
+
+      var normData = jStat.seq(min, max, interaciones, x => {
+        return jStat.normal.pdf(x, mean, stdev)
+      })
 
       let option = {
         color: ['#3398DB'],
@@ -310,7 +388,7 @@ export default {
           {
             gridIndex: 1,
             type: 'value',
-            scale: true,
+            scale: false,
             axisLine: {
               lineStyle: {
                 color: '#90979c'
@@ -320,7 +398,8 @@ export default {
           {
             gridIndex: 1,
             type: 'value',
-            scale: true,
+            scale: false,
+            show: false,
             axisLine: {
               lineStyle: {
                 color: '#90979c'
@@ -610,7 +689,7 @@ export default {
                 color: 'black'
               }
             },
-            data: distribucionNormalValues
+            data: normData
           },
           {
             name: 'Rango',
@@ -676,55 +755,6 @@ export default {
 
       this.chart.setOption(option)
     },
-    filtraLimite() {
-      if (this.limites.length > 0) {
-        if (this.codigoProductoSelecionado !== 'Todos') {
-          const limites = this.limites.filter(limite => {
-            if (
-              parseInt(limite.codigo_producto) ===
-                parseInt(this.codigoProductoSelecionado) ||
-              limite.codigo_producto === null
-            ) {
-              return true
-            }
-          })
-
-          if (limites.length > 0) {
-            this.limite = limites[limites.length - 1]
-          } else {
-            this.limpiarLimite()
-          }
-        } else {
-          this.limite = this.limites[this.limites.length - 1]
-        }
-      } else {
-        this.limpiarLimite()
-      }
-    },
-    agruparProductosHistoricos() {
-      const productosHistorico = _.groupBy(this.historicos, 'codigo_producto')
-      this.productosHistoricoFiltrado = []
-      for (const key in productosHistorico) {
-        this.productosHistoricoFiltrado.push(key)
-      }
-    },
-    limpiarLimite() {
-      this.limite = {
-        lh_1sigma: 0,
-        ll_1sigma: 0,
-        lh_2sigma: 0,
-        ll_2sigma: 0,
-        lh_3sigma: 0,
-        ll_3sigma: 0,
-        usl: 0,
-        lsl: 0,
-        usl_rango: 0,
-        lsl_rango: 0,
-        media_historica: 0,
-        media_rango_historica: 0,
-        codigo_producto: null
-      }
-    },
     normalDist(media, std, x) {
       return (
         (1 / (std * Math.sqrt(2 * Math.PI))) *
@@ -733,21 +763,31 @@ export default {
     },
     numeroClase(numeroDatos) {
       if (numeroDatos <= 50) {
-        return 6
+        return 5
       }
       if (numeroDatos <= 100) {
-        return 7
+        return 6
       }
       if (numeroDatos <= 200) {
-        return 8
+        return 7
       }
       if (numeroDatos <= 500) {
-        return 9
+        return 8
       }
       if (numeroDatos <= 1000) {
-        return 10
+        return 9
       }
-      return 15
+      return 14
+    },
+    agruparProductosHistoricos() {
+      const productosHistorico = _.groupBy(
+        this.historicosAcumulados.historicos,
+        'codigo_producto'
+      )
+      this.productosHistoricoFiltrado = []
+      for (const key in productosHistorico) {
+        this.productosHistoricoFiltrado.push(key)
+      }
     },
     colorBotonCodigoProducto(codigo) {
       if (this.codigoProductoSelecionado === codigo) {

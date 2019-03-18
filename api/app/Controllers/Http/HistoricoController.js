@@ -7,7 +7,7 @@ const moment = require('moment');
 class HistoricoController {
   async index({ request, response }) {
     let { tendencia, productos, desde, hasta } = request.get();
-    tendencia = tendencia || 6;
+    tendencia = tendencia || 1;
     productos = productos || [];
     hasta = hasta || moment().format('YYYY-MM-DD HH:mm:ss');
     desde =

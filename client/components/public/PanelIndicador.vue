@@ -134,38 +134,37 @@ export default {
 
   computed: {
     ...mapGetters([
-      'limites',
-      'historicos',
-      'variablesTendenciaHistoricas',
-      'aplicarFiltroTendencia',
-      'actualizarTendenciaHistoricas'
+      'historicosFiltradosPorProducto',
+      'limiteFiltradoPorProducto'
     ])
   },
 
   watch: {
-    aplicarFiltroTendencia() {
-      // this.completarPanel()
+    historicosFiltradosPorProducto() {
+      this.completarPanel()
     }
   },
 
   methods: {
     completarPanel() {
+      const limite = this.limiteFiltradoPorProducto
+
       this.limite.media_historica = mathjs.round(limite.media_historica, 2)
       this.limite.media_rango_historica = mathjs.round(
         limite.media_rango_historica,
         2
       )
-      this.limite.lsl = mathjs.round(limite.lsl, 2)
-      this.limite.usl = mathjs.round(limite.usl, 2)
-      this.limite.lsl_r = mathjs.round(limite.lsl_r, 2)
-      this.limite.usl_l = mathjs.round(limite.usl_l, 2)
-      this.limite.lh_1sigma = mathjs.round(limite.lh_1sigma, 2)
-      this.limite.ll_1sigma = mathjs.round(limite.ll_1sigma, 2)
-      this.limite.lh_2sigma = mathjs.round(limite.lh_2sigma, 2)
-      this.limite.ll_2sigma = mathjs.round(limite.ll_2sigma, 2)
-      this.limite.lh_3sigma = mathjs.round(limite.lh_3sigma, 2)
-      this.limite.ll_3sigma = mathjs.round(limite.ll_3sigma, 2)
-      let historicos = this.historicos
+      this.limite.lsl = mathjs.round(limite.lsl | 0, 2)
+      this.limite.usl = mathjs.round(limite.usl | 0, 2)
+      this.limite.lsl_r = mathjs.round(limite.lsl_rango | 0, 2)
+      this.limite.usl_l = mathjs.round(limite.usl_rango | 0, 2)
+      this.limite.lh_1sigma = mathjs.round(limite.lh_1sigma | 0, 2)
+      this.limite.ll_1sigma = mathjs.round(limite.ll_1sigma | 0, 2)
+      this.limite.lh_2sigma = mathjs.round(limite.lh_2sigma | 0, 2)
+      this.limite.ll_2sigma = mathjs.round(limite.ll_2sigma | 0, 2)
+      this.limite.lh_3sigma = mathjs.round(limite.lh_3sigma | 0, 2)
+      this.limite.ll_3sigma = mathjs.round(limite.ll_3sigma | 0, 2)
+      let historicos = this.historicosFiltradosPorProducto
 
       if (historicos.length > 3) {
         let pv = historicos.map(item => {
