@@ -28,7 +28,7 @@ services:
       - ./api:/home/api
     working_dir: "/home/api"
     environment:
-      MODE: prod
+      MODE: dev
       HOST: 0.0.0.0
       PORT: 3333
       NODE_ENV: development
@@ -65,7 +65,7 @@ services:
       - ./client:/home/client
     working_dir: "/home/client"
     environment:
-      MODE: prod
+      MODE: dev
       HOST: 0.0.0.0
       PORT: 3000
     command: ["bash", "/home/client/run.sh"]
