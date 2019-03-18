@@ -1,3 +1,3 @@
-command yarn install
-command yarn run build
-command yarn run start
+command npm install
+command npm run build
+command npm run start

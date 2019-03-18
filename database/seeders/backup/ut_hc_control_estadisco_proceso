@@ -1,0 +1,1541 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 11.2 (Debian 11.2-1.pgdg90+1)
+-- Dumped by pg_dump version 11.2 (Debian 11.2-1.pgdg90+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: adonis_schema; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.adonis_schema (
+    id integer NOT NULL,
+    name character varying(255),
+    batch integer,
+    migration_time timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.adonis_schema OWNER TO sysa;
+
+--
+-- Name: adonis_schema_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.adonis_schema_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.adonis_schema_id_seq OWNER TO sysa;
+
+--
+-- Name: adonis_schema_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.adonis_schema_id_seq OWNED BY public.adonis_schema.id;
+
+
+--
+-- Name: alarmas; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.alarmas (
+    id integer NOT NULL,
+    descripcion character varying(255),
+    codigo_producto character varying(255),
+    tendencia_id integer,
+    tipo integer,
+    prioridad integer,
+    reconocida boolean DEFAULT false,
+    usuario character varying(255),
+    detalle character varying(255),
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+
+
+ALTER TABLE public.alarmas OWNER TO sysa;
+
+--
+-- Name: alarmas_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.alarmas_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.alarmas_id_seq OWNER TO sysa;
+
+--
+-- Name: alarmas_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.alarmas_id_seq OWNED BY public.alarmas.id;
+
+
+--
+-- Name: destinatarios; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.destinatarios (
+    id integer NOT NULL,
+    nombre character varying(255) DEFAULT ''::character varying,
+    apellido character varying(255) DEFAULT ''::character varying,
+    email character varying(255) NOT NULL,
+    envio boolean DEFAULT false,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+
+
+ALTER TABLE public.destinatarios OWNER TO sysa;
+
+--
+-- Name: destinatarios_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.destinatarios_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.destinatarios_id_seq OWNER TO sysa;
+
+--
+-- Name: destinatarios_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.destinatarios_id_seq OWNED BY public.destinatarios.id;
+
+
+--
+-- Name: historicos; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.historicos (
+    fecha timestamp with time zone,
+    pv real,
+    sp real,
+    tk real,
+    codigo_producto real,
+    disparo_alarma boolean,
+    tendencia_id integer
+);
+
+
+ALTER TABLE public.historicos OWNER TO sysa;
+
+--
+-- Name: limites; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.limites (
+    id integer NOT NULL,
+    ultimo boolean,
+    lh_1sigma real,
+    ll_1sigma real,
+    lh_2sigma real,
+    ll_2sigma real,
+    lh_3sigma real,
+    ll_3sigma real,
+    usl real,
+    lsl real,
+    usl_rango real,
+    lsl_rango real,
+    media_historica real,
+    media_rango_historica real,
+    codigo_producto real,
+    tendencia_id integer,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+
+
+ALTER TABLE public.limites OWNER TO sysa;
+
+--
+-- Name: limites_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.limites_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.limites_id_seq OWNER TO sysa;
+
+--
+-- Name: limites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.limites_id_seq OWNED BY public.limites.id;
+
+
+--
+-- Name: mixer_producto; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.mixer_producto (
+    id integer NOT NULL,
+    mixer_id integer,
+    producto_id integer
+);
+
+
+ALTER TABLE public.mixer_producto OWNER TO sysa;
+
+--
+-- Name: mixer_producto_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.mixer_producto_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mixer_producto_id_seq OWNER TO sysa;
+
+--
+-- Name: mixer_producto_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.mixer_producto_id_seq OWNED BY public.mixer_producto.id;
+
+
+--
+-- Name: mixers; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.mixers (
+    id integer NOT NULL,
+    nombre character varying(255),
+    descripcion character varying(255)
+);
+
+
+ALTER TABLE public.mixers OWNER TO sysa;
+
+--
+-- Name: mixers_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.mixers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mixers_id_seq OWNER TO sysa;
+
+--
+-- Name: mixers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.mixers_id_seq OWNED BY public.mixers.id;
+
+
+--
+-- Name: productos; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.productos (
+    id integer NOT NULL,
+    codigo character varying(255),
+    descripcion character varying(255)
+);
+
+
+ALTER TABLE public.productos OWNER TO sysa;
+
+--
+-- Name: productos_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.productos_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.productos_id_seq OWNER TO sysa;
+
+--
+-- Name: productos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.productos_id_seq OWNED BY public.productos.id;
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.tags (
+    id integer NOT NULL,
+    archive_id integer,
+    tag_name character varying(255),
+    tipo integer,
+    filtrado boolean,
+    tendencia_id integer
+);
+
+
+ALTER TABLE public.tags OWNER TO sysa;
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.tags_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tags_id_seq OWNER TO sysa;
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
+
+
+--
+-- Name: tecnologia_mixer; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.tecnologia_mixer (
+    id integer NOT NULL,
+    tecnologia_id integer,
+    mixer_id integer
+);
+
+
+ALTER TABLE public.tecnologia_mixer OWNER TO sysa;
+
+--
+-- Name: tecnologia_mixer_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.tecnologia_mixer_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tecnologia_mixer_id_seq OWNER TO sysa;
+
+--
+-- Name: tecnologia_mixer_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.tecnologia_mixer_id_seq OWNED BY public.tecnologia_mixer.id;
+
+
+--
+-- Name: tecnologias; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.tecnologias (
+    id integer NOT NULL,
+    nombre character varying(255),
+    descripcion character varying(255)
+);
+
+
+ALTER TABLE public.tecnologias OWNER TO sysa;
+
+--
+-- Name: tecnologias_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.tecnologias_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tecnologias_id_seq OWNER TO sysa;
+
+--
+-- Name: tecnologias_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.tecnologias_id_seq OWNED BY public.tecnologias.id;
+
+
+--
+-- Name: tendencias; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.tendencias (
+    id integer NOT NULL,
+    nombre character varying(255),
+    tipo character varying(255),
+    descripcion character varying(255),
+    tag character varying(255),
+    tag_codigo_producto integer,
+    ultima_actualizacion timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    tv boolean DEFAULT false,
+    tiempo_real boolean DEFAULT false,
+    mixer_id integer
+);
+
+
+ALTER TABLE public.tendencias OWNER TO sysa;
+
+--
+-- Name: tokens; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.tokens (
+    id integer NOT NULL,
+    user_id integer,
+    token character varying(255) NOT NULL,
+    type character varying(80) NOT NULL,
+    is_revoked boolean DEFAULT false,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+
+
+ALTER TABLE public.tokens OWNER TO sysa;
+
+--
+-- Name: tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.tokens_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tokens_id_seq OWNER TO sysa;
+
+--
+-- Name: tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.tokens_id_seq OWNED BY public.tokens.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: sysa
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    username character varying(80) NOT NULL,
+    email character varying(254) NOT NULL,
+    password character varying(60) NOT NULL,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone
+);
+
+
+ALTER TABLE public.users OWNER TO sysa;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: sysa
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO sysa;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sysa
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: adonis_schema id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.adonis_schema ALTER COLUMN id SET DEFAULT nextval('public.adonis_schema_id_seq'::regclass);
+
+
+--
+-- Name: alarmas id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.alarmas ALTER COLUMN id SET DEFAULT nextval('public.alarmas_id_seq'::regclass);
+
+
+--
+-- Name: destinatarios id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.destinatarios ALTER COLUMN id SET DEFAULT nextval('public.destinatarios_id_seq'::regclass);
+
+
+--
+-- Name: limites id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.limites ALTER COLUMN id SET DEFAULT nextval('public.limites_id_seq'::regclass);
+
+
+--
+-- Name: mixer_producto id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.mixer_producto ALTER COLUMN id SET DEFAULT nextval('public.mixer_producto_id_seq'::regclass);
+
+
+--
+-- Name: mixers id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.mixers ALTER COLUMN id SET DEFAULT nextval('public.mixers_id_seq'::regclass);
+
+
+--
+-- Name: productos id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.productos ALTER COLUMN id SET DEFAULT nextval('public.productos_id_seq'::regclass);
+
+
+--
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
+
+
+--
+-- Name: tecnologia_mixer id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tecnologia_mixer ALTER COLUMN id SET DEFAULT nextval('public.tecnologia_mixer_id_seq'::regclass);
+
+
+--
+-- Name: tecnologias id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tecnologias ALTER COLUMN id SET DEFAULT nextval('public.tecnologias_id_seq'::regclass);
+
+
+--
+-- Name: tokens id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tokens ALTER COLUMN id SET DEFAULT nextval('public.tokens_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: adonis_schema; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.adonis_schema (id, name, batch, migration_time) FROM stdin;
+1	1503250034279_user	1	2019-03-14 12:12:59.920342+00
+2	1503250034280_token	1	2019-03-14 12:12:59.96017+00
+3	1530402003374_tecnologia_schema	1	2019-03-14 12:12:59.982999+00
+4	1530502980799_mixer_schema	1	2019-03-14 12:13:00.005807+00
+5	1530502990676_producto_schema	1	2019-03-14 12:13:00.029166+00
+6	1540503009410_tendencia_schema	1	2019-03-14 12:13:00.054921+00
+7	1550502935966_alarma_schema	1	2019-03-14 12:13:00.077196+00
+8	1550502964008_historico_schema	1	2019-03-14 12:13:00.09506+00
+9	1550502971356_limite_schema	1	2019-03-14 12:13:00.104244+00
+10	1550502996338_tag_schema	1	2019-03-14 12:13:00.118379+00
+11	1550604725184_tecnologia_mixer_schema	1	2019-03-14 12:13:00.132862+00
+12	1550604733963_mixer_producto_schema	1	2019-03-14 12:13:00.146349+00
+13	1551902537006_destinatario_schema	1	2019-03-14 12:13:00.17511+00
+\.
+
+
+--
+-- Data for Name: alarmas; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.alarmas (id, descripcion, codigo_producto, tendencia_id, tipo, prioridad, reconocida, usuario, detalle, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: destinatarios; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.destinatarios (id, nombre, apellido, email, envio, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: historicos; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.historicos (fecha, pv, sp, tk, codigo_producto, disparo_alarma, tendencia_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: limites; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.limites (id, ultimo, lh_1sigma, ll_1sigma, lh_2sigma, ll_2sigma, lh_3sigma, ll_3sigma, usl, lsl, usl_rango, lsl_rango, media_historica, media_rango_historica, codigo_producto, tendencia_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: mixer_producto; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.mixer_producto (id, mixer_id, producto_id) FROM stdin;
+1	1	1
+2	1	2
+3	1	3
+4	1	6
+5	1	5
+6	2	4
+7	2	8
+8	2	9
+9	2	10
+10	2	11
+11	2	12
+12	2	13
+13	2	14
+14	2	22
+15	2	23
+16	2	24
+17	2	25
+18	2	26
+19	2	27
+20	2	37
+21	3	4
+22	3	8
+23	3	9
+24	3	10
+25	3	13
+26	3	14
+27	3	29
+28	4	4
+29	4	8
+30	4	11
+31	4	24
+32	4	25
+33	4	26
+34	4	27
+35	4	37
+36	5	4
+37	5	7
+38	5	8
+39	5	11
+40	5	12
+41	5	13
+42	5	24
+43	5	26
+44	5	27
+45	5	28
+46	5	37
+47	6	4
+48	6	8
+49	6	11
+50	6	12
+51	6	22
+52	6	23
+53	6	24
+54	6	25
+55	6	26
+56	6	27
+57	6	37
+58	3	15
+59	3	16
+60	3	17
+61	3	18
+62	3	19
+63	3	20
+64	3	21
+65	6	15
+66	6	16
+67	6	17
+68	6	18
+69	6	19
+70	6	20
+71	6	21
+72	3	30
+73	3	31
+74	3	32
+75	3	33
+76	3	36
+77	4	30
+78	4	32
+79	4	33
+80	5	30
+81	5	31
+82	5	32
+83	5	33
+84	5	34
+85	5	35
+86	6	30
+87	6	31
+88	6	32
+89	6	33
+90	6	34
+91	6	35
+92	6	36
+\.
+
+
+--
+-- Data for Name: mixers; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.mixers (id, nombre, descripcion) FROM stdin;
+1	Mixer 1	\N
+2	Mixer 2	\N
+3	Mixer 3	\N
+4	Mixer 4	\N
+5	Mixer 5	\N
+6	Mixer 8	\N
+\.
+
+
+--
+-- Data for Name: productos; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.productos (id, codigo, descripcion) FROM stdin;
+1	67261247	
+2	67261248	
+3	67261249	
+4	67265016	
+5	67270965	
+6	67271964	
+7	67279251	
+8	67294518	
+9	67309858	
+10	67309859	
+11	67322169	
+12	67334873	
+13	67366993	
+14	67380038	
+15	67453274	
+16	67453457	
+17	67453460	
+18	67453461	
+19	67453462	
+20	67453463	
+21	67453464	
+22	67530968	
+23	67530993	
+24	67535058	
+25	67580257	
+26	67580258	
+27	67580259	
+28	67619005	
+29	67684549	
+30	83328912	
+31	83328914	
+32	83328915	
+33	83328916	
+34	83328927	
+35	83328957	
+36	83333583	
+37	83350789	
+\.
+
+
+--
+-- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.tags (id, archive_id, tag_name, tipo, filtrado, tendencia_id) FROM stdin;
+1	2	SystemArchive\\Disp_MX5000/TT_5	1	f	44
+2	3	SystemArchive\\Disp_MX5000/WT_5	1	f	49
+3	445	SystemArchive\\Disp_MX3000/TT_3	1	f	113
+4	455	SystemArchive\\Disp_MX4000/TT_4	1	f	116
+5	459	SystemArchive\\Disp_MX4200/TT_4	1	f	128
+6	461	SystemArchive\\Disp_MX4300/TT_4	1	f	111
+7	951	SystemArchive\\Disp_MX8000/TT_8	1	f	121
+8	1613	SystemArchive\\AS1_SPC/Dosif_Cu	1	t	3
+9	1614	SystemArchive\\AS1_SPC/Dosif_Cu	2	t	3
+10	1618	SystemArchive\\AS1_SPC/Dosif_Bi	1	t	2
+11	1620	SystemArchive\\AS1_SPC/Dosif_LA	1	t	6
+12	1621	SystemArchive\\AS1_SPC/Dosif_LA	2	t	6
+13	1623	SystemArchive\\AS1_SPC/Dosif_LW	1	t	10
+14	1624	SystemArchive\\AS1_SPC/Dosif_LW	2	t	10
+15	1626	SystemArchive\\AS1_SPC/Dosif_LW	1	t	11
+16	1627	SystemArchive\\AS1_SPC/Dosif_LW	2	t	11
+17	1629	SystemArchive\\AS1_SPC/Dosif_SL	1	t	14
+18	1630	SystemArchive\\AS1_SPC/Dosif_SL	2	t	14
+19	1632	SystemArchive\\AS1_SPC/Ph_MX120	1	t	20
+20	1634	SystemArchive\\AS1_SPC/Temp_LW1	1	t	21
+21	1636	SystemArchive\\AS1_SPC/Temp_LW1	1	t	22
+22	1638	SystemArchive\\AS1_SPC/Dosif_An	1	t	1
+23	1639	SystemArchive\\AS1_SPC/Dosif_An	2	t	1
+24	1641	SystemArchive\\AS1_SPC/Dosif_En	1	t	4
+25	1642	SystemArchive\\AS1_SPC/Dosif_En	2	t	4
+26	1644	SystemArchive\\AS1_SPC/Dosif_EP	1	t	5
+27	1645	SystemArchive\\AS1_SPC/Dosif_EP	2	t	5
+28	1647	SystemArchive\\AS1_SPC/Dosif_LA	1	t	7
+29	1648	SystemArchive\\AS1_SPC/Dosif_LA	2	t	7
+30	1650	SystemArchive\\AS1_SPC/Dosif_LE	1	t	8
+31	1651	SystemArchive\\AS1_SPC/Dosif_LE	2	t	8
+32	1653	SystemArchive\\AS1_SPC/Dosif_LW	1	t	9
+33	1654	SystemArchive\\AS1_SPC/Dosif_LW	2	t	9
+34	1656	SystemArchive\\AS1_SPC/Dosif_Pr	1	t	12
+35	1657	SystemArchive\\AS1_SPC/Dosif_Pr	2	t	12
+36	1659	SystemArchive\\AS1_SPC/Dosif_Sa	1	t	13
+37	1660	SystemArchive\\AS1_SPC/Dosif_Sa	2	t	13
+38	1662	SystemArchive\\AS1_SPC/Dosif_So	1	t	15
+39	1663	SystemArchive\\AS1_SPC/Dosif_So	2	t	15
+40	1665	SystemArchive\\AS1_SPC/Dosif_SR	1	t	17
+41	1666	SystemArchive\\AS1_SPC/Dosif_SR	2	t	17
+42	1668	SystemArchive\\AS1_SPC/Dosif_TE	1	t	18
+43	1669	SystemArchive\\AS1_SPC/Dosif_TE	2	t	18
+44	1671	SystemArchive\\AS1_SPC/Dosif_Un	1	t	19
+45	1672	SystemArchive\\AS1_SPC/Dosif_Un	2	t	19
+46	1674	SystemArchive\\AS1_SPC/Temp_MX2	1	t	23
+47	1676	SystemArchive\\AS1_SPC/Temp_MX2	1	t	24
+48	1678	SystemArchive\\AS1_SPC/Temp_MX2	1	t	52
+49	1680	SystemArchive\\AS2_SPC/Dosif_An	1	t	58
+50	1681	SystemArchive\\AS2_SPC/Dosif_An	2	t	58
+51	1683	SystemArchive\\AS2_SPC/Dosif_An	1	t	59
+52	1684	SystemArchive\\AS2_SPC/Dosif_An	2	t	59
+53	1686	SystemArchive\\AS2_SPC/Dosif_An	1	t	60
+54	1687	SystemArchive\\AS2_SPC/Dosif_An	2	t	60
+55	1689	SystemArchive\\AS2_SPC/Dosif_En	1	t	64
+56	1690	SystemArchive\\AS2_SPC/Dosif_En	2	t	64
+57	1692	SystemArchive\\AS2_SPC/Dosif_En	1	t	65
+58	1693	SystemArchive\\AS2_SPC/Dosif_En	2	t	65
+59	1695	SystemArchive\\AS2_SPC/Dosif_EP	1	t	66
+60	1696	SystemArchive\\AS2_SPC/Dosif_EP	2	t	66
+61	1698	SystemArchive\\AS2_SPC/Dosif_EP	1	t	67
+62	1699	SystemArchive\\AS2_SPC/Dosif_EP	2	t	67
+63	1701	SystemArchive\\AS2_SPC/Dosif_EP	1	t	68
+64	1702	SystemArchive\\AS2_SPC/Dosif_EP	2	t	68
+65	1704	SystemArchive\\AS2_SPC/Dosif_LA	1	t	72
+66	1705	SystemArchive\\AS2_SPC/Dosif_LA	2	t	72
+67	1707	SystemArchive\\AS2_SPC/Dosif_LA	1	t	73
+68	1708	SystemArchive\\AS2_SPC/Dosif_LA	2	t	73
+69	1710	SystemArchive\\AS2_SPC/Dosif_LA	1	t	74
+70	1711	SystemArchive\\AS2_SPC/Dosif_LA	2	t	74
+71	1713	SystemArchive\\AS2_SPC/Dosif_LE	1	t	75
+72	1714	SystemArchive\\AS2_SPC/Dosif_LE	2	t	75
+73	1716	SystemArchive\\AS2_SPC/Dosif_LE	1	t	76
+74	1717	SystemArchive\\AS2_SPC/Dosif_LE	2	t	76
+75	1719	SystemArchive\\AS2_SPC/Dosif_LE	1	t	77
+76	1720	SystemArchive\\AS2_SPC/Dosif_LE	2	t	77
+77	1722	SystemArchive\\AS2_SPC/Dosif_Pr	1	t	78
+78	1723	SystemArchive\\AS2_SPC/Dosif_Pr	2	t	78
+79	1725	SystemArchive\\AS2_SPC/Dosif_Pr	1	t	79
+80	1726	SystemArchive\\AS2_SPC/Dosif_Pr	2	t	79
+81	1728	SystemArchive\\AS2_SPC/Dosif_Pr	1	t	80
+82	1729	SystemArchive\\AS2_SPC/Dosif_Pr	2	t	80
+83	1740	SystemArchive\\AS2_SPC/Dosif_So	1	t	87
+84	1741	SystemArchive\\AS2_SPC/Dosif_So	2	t	87
+85	1743	SystemArchive\\AS2_SPC/Dosif_So	1	t	88
+86	1744	SystemArchive\\AS2_SPC/Dosif_So	2	t	88
+87	1746	SystemArchive\\AS2_SPC/Dosif_So	1	t	89
+88	1747	SystemArchive\\AS2_SPC/Dosif_So	2	t	89
+89	1749	SystemArchive\\AS2_SPC/Dosif_SR	1	t	91
+90	1750	SystemArchive\\AS2_SPC/Dosif_SR	2	t	91
+91	1752	SystemArchive\\AS2_SPC/Dosif_SR	1	t	92
+92	1753	SystemArchive\\AS2_SPC/Dosif_SR	2	t	92
+93	1755	SystemArchive\\AS2_SPC/Dosif_SR	1	t	93
+94	1756	SystemArchive\\AS2_SPC/Dosif_SR	2	t	93
+95	1758	SystemArchive\\AS2_SPC/Dosif_TE	1	t	94
+96	1759	SystemArchive\\AS2_SPC/Dosif_TE	2	t	94
+97	1761	SystemArchive\\AS2_SPC/Dosif_TE	1	t	95
+98	1762	SystemArchive\\AS2_SPC/Dosif_TE	2	t	95
+99	1764	SystemArchive\\AS2_SPC/Dosif_TE	1	t	96
+100	1765	SystemArchive\\AS2_SPC/Dosif_TE	2	t	96
+101	1767	SystemArchive\\AS2_SPC/Dosif_Un	1	t	97
+102	1768	SystemArchive\\AS2_SPC/Dosif_Un	2	t	97
+103	1770	SystemArchive\\AS2_SPC/Dosif_Un	1	t	98
+104	1771	SystemArchive\\AS2_SPC/Dosif_Un	2	t	98
+105	1773	SystemArchive\\AS2_SPC/Dosif_Un	1	t	99
+106	1774	SystemArchive\\AS2_SPC/Dosif_Un	2	t	99
+107	1776	SystemArchive\\AS2_SPC/DosifLW1	1	t	106
+108	1777	SystemArchive\\AS2_SPC/DosifLW1	2	t	106
+109	1779	SystemArchive\\AS2_SPC/DosifLW1	1	t	107
+110	1780	SystemArchive\\AS2_SPC/DosifLW1	2	t	107
+111	1782	SystemArchive\\AS2_SPC/DosifLW1	1	t	108
+112	1783	SystemArchive\\AS2_SPC/DosifLW1	2	t	108
+113	1801	SystemArchive\\AS4_SPC/Dosif_An	1	t	26
+114	1802	SystemArchive\\AS4_SPC/Dosif_An	2	t	26
+115	1804	SystemArchive\\AS4_SPC/Dosif_En	1	t	28
+116	1805	SystemArchive\\AS4_SPC/Dosif_En	2	t	28
+117	1807	SystemArchive\\AS4_SPC/Dosif_EP	1	t	29
+118	1808	SystemArchive\\AS4_SPC/Dosif_EP	2	t	29
+119	1810	SystemArchive\\AS4_SPC/Dosif_LA	1	t	31
+120	1811	SystemArchive\\AS4_SPC/Dosif_LA	2	t	31
+121	1813	SystemArchive\\AS4_SPC/Dosif_LE	1	t	32
+122	1814	SystemArchive\\AS4_SPC/Dosif_LE	2	t	32
+123	1816	SystemArchive\\AS4_SPC/Dosif_LW	1	t	33
+124	1817	SystemArchive\\AS4_SPC/Dosif_LW	2	t	33
+125	1819	SystemArchive\\AS4_SPC/Dosif_Pr	1	t	34
+126	1820	SystemArchive\\AS4_SPC/Dosif_Pr	2	t	34
+127	1822	SystemArchive\\AS4_SPC/Dosif_Sa	1	t	36
+128	1823	SystemArchive\\AS4_SPC/Dosif_Sa	2	t	36
+129	1825	SystemArchive\\AS4_SPC/Dosif_So	1	t	37
+130	1826	SystemArchive\\AS4_SPC/Dosif_So	2	t	37
+131	1828	SystemArchive\\AS4_SPC/Dosif_SR	1	t	39
+132	1829	SystemArchive\\AS4_SPC/Dosif_SR	2	t	39
+133	1831	SystemArchive\\AS4_SPC/Dosif_TE	1	t	40
+134	1832	SystemArchive\\AS4_SPC/Dosif_TE	2	t	40
+135	1834	SystemArchive\\AS4_SPC/Dosif_Un	1	t	41
+136	1835	SystemArchive\\AS4_SPC/Dosif_Un	2	t	41
+137	1843	SystemArchive\\AS2_SPC/Dosif_Ag	1	t	55
+138	1844	SystemArchive\\AS2_SPC/Dosif_Ag	2	t	55
+139	1846	SystemArchive\\AS2_SPC/Dosif_Ag	1	t	56
+140	1847	SystemArchive\\AS2_SPC/Dosif_Ag	2	t	56
+141	1849	SystemArchive\\AS2_SPC/Dosif_Ag	1	t	57
+142	1850	SystemArchive\\AS2_SPC/Dosif_Ag	2	t	57
+143	1852	SystemArchive\\AS2_SPC/Dosif_Cl	1	t	61
+144	1853	SystemArchive\\AS2_SPC/Dosif_Cl	2	t	61
+145	1855	SystemArchive\\AS2_SPC/Dosif_Cl	1	t	62
+146	1856	SystemArchive\\AS2_SPC/Dosif_Cl	2	t	62
+147	1858	SystemArchive\\AS2_SPC/Dosif_Cl	1	t	63
+148	1859	SystemArchive\\AS2_SPC/Dosif_Cl	2	t	63
+149	1861	SystemArchive\\AS2_SPC/Dosif_fu	1	t	69
+150	1862	SystemArchive\\AS2_SPC/Dosif_fu	2	t	69
+151	1864	SystemArchive\\AS2_SPC/Dosif_fu	1	t	70
+152	1865	SystemArchive\\AS2_SPC/Dosif_fu	2	t	70
+153	1870	SystemArchive\\AS2_SPC/Dosif_Qu	1	t	81
+154	1871	SystemArchive\\AS2_SPC/Dosif_Qu	2	t	81
+155	1873	SystemArchive\\AS2_SPC/Dosif_Qu	1	t	82
+156	1874	SystemArchive\\AS2_SPC/Dosif_Qu	2	t	82
+157	1879	SystemArchive\\AS2_SPC/DosifFlo	1	t	100
+158	1880	SystemArchive\\AS2_SPC/DosifFlo	2	t	100
+159	1882	SystemArchive\\AS2_SPC/DosifFlo	1	t	101
+160	1883	SystemArchive\\AS2_SPC/DosifFlo	2	t	101
+161	1885	SystemArchive\\AS2_SPC/DosifFlo	1	t	102
+162	1886	SystemArchive\\AS2_SPC/DosifFlo	2	t	102
+163	1888	SystemArchive\\AS2_SPC/DosifLW1	1	t	103
+164	1889	SystemArchive\\AS2_SPC/DosifLW1	2	t	103
+165	1891	SystemArchive\\AS2_SPC/DosifLW1	1	t	104
+166	1892	SystemArchive\\AS2_SPC/DosifLW1	2	t	104
+167	1894	SystemArchive\\AS2_SPC/DosifLW1	1	t	105
+168	1895	SystemArchive\\AS2_SPC/DosifLW1	2	t	105
+169	1897	SystemArchive\\AS2_SPC/Temp_fus	1	t	109
+170	1899	SystemArchive\\AS2_SPC/Temp_fus	1	t	110
+171	1903	SystemArchive\\AS2_SPC/Temp_MX3	1	t	112
+172	1905	SystemArchive\\AS2_SPC/Temp_MX3	1	t	115
+173	1907	SystemArchive\\AS2_SPC/Temp_MX4	1	t	117
+174	1909	SystemArchive\\AS2_SPC/Temp_MX4	1	t	120
+175	1911	SystemArchive\\AS2_SPC/Temp_MX8	1	t	122
+176	1913	SystemArchive\\AS2_SPC/Temp_MX8	1	t	125
+177	1915	SystemArchive\\AS2_SPC/Temp_PM3	1	t	126
+178	1917	SystemArchive\\AS2_SPC/Temp_PM4	1	t	127
+179	1921	SystemArchive\\AS2_SPC/WT_desc_	1	t	130
+180	1923	SystemArchive\\AS2_SPC/WT_desc_	1	t	131
+181	1925	SystemArchive\\AS2_SPC/WT_desc_	1	t	132
+182	1927	SystemArchive\\AS4_SPC/Dosif_Ag	1	t	25
+183	1928	SystemArchive\\AS4_SPC/Dosif_Ag	2	t	25
+184	1930	SystemArchive\\AS4_SPC/Dosif_Cl	1	t	27
+185	1931	SystemArchive\\AS4_SPC/Dosif_Cl	2	t	27
+186	1933	SystemArchive\\AS4_SPC/DosifFlo	1	t	42
+187	1934	SystemArchive\\AS4_SPC/DosifFlo	2	t	42
+188	1936	SystemArchive\\AS4_SPC/DosifLW1	1	t	43
+189	1937	SystemArchive\\AS4_SPC/DosifLW1	2	t	43
+190	1945	SystemArchive\\AS4_SPC/WT_desc_	1	t	49
+191	1947	SystemArchive\\AS2_SPC/Dosif_fu	1	t	71
+192	1948	SystemArchive\\AS2_SPC/Dosif_fu	2	t	71
+193	1949	SystemArchive\\AS2_SPC/Dosif_Qu	1	t	83
+194	1950	SystemArchive\\AS2_SPC/Dosif_Qu	2	t	83
+195	1951	SystemArchive\\AS4_SPC/Dosif_fu	1	t	30
+196	1952	SystemArchive\\AS4_SPC/Dosif_fu	2	t	30
+197	1954	SystemArchive\\AS4_SPC/Dosif_Qu	1	t	35
+198	1955	SystemArchive\\AS4_SPC/Dosif_Qu	2	t	35
+199	1956	SystemArchive\\AS2_SPC/Dosif_Sa	1	t	84
+200	1957	SystemArchive\\AS2_SPC/Dosif_Sa	2	t	84
+201	1958	SystemArchive\\AS2_SPC/Dosif_Sa	1	t	85
+202	1959	SystemArchive\\AS2_SPC/Dosif_Sa	2	t	85
+203	1960	SystemArchive\\AS2_SPC/Dosif_So	1	t	90
+204	1961	SystemArchive\\AS2_SPC/Dosif_So	2	t	90
+205	1962	SystemArchive\\AS2_SPC/Temp_fus	5	t	111
+206	1963	SystemArchive\\AS2_SPC/Temp_MX3	5	t	113
+207	1964	SystemArchive\\AS2_SPC/Temp_MX3	5	t	114
+208	1965	SystemArchive\\AS2_SPC/Temp_MX4	5	t	116
+209	1966	SystemArchive\\AS2_SPC/Temp_MX4	5	t	118
+210	1967	SystemArchive\\AS2_SPC/Temp_MX4	5	t	119
+211	1968	SystemArchive\\AS2_SPC/Temp_PM5	5	t	128
+212	1969	SystemArchive\\AS1_SPC/Dosif_So	1	t	16
+213	1970	SystemArchive\\AS1_SPC/Dosif_So	2	t	16
+214	1971	SystemArchive\\Unit_MX1000/CP_M	6	t	53
+215	1972	SystemArchive\\Unit_MX2000/CP_M	6	t	54
+216	1973	SystemArchive\\AS2_SPC/Dosif_Sa	1	t	86
+217	1974	SystemArchive\\AS2_SPC/Dosif_Sa	2	t	86
+218	1975	SystemArchive\\AS2_SPC/Temp_MX8	5	t	121
+219	1976	SystemArchive\\AS2_SPC/Temp_MX8	5	t	123
+220	1977	SystemArchive\\AS2_SPC/Temp_MX8	5	t	124
+221	1978	SystemArchive\\AS2_SPC/Temp_PM8	1	t	129
+222	1979	SystemArchive\\AS2_SPC/Temp_PM8	3	t	129
+223	1980	SystemArchive\\Unit_MX3000/CP_M	6	t	133
+224	1981	SystemArchive\\Unit_MX3200/CP_M	6	t	134
+225	1982	SystemArchive\\Unit_MX4000/CP_M	6	t	135
+226	1983	SystemArchive\\Unit_MX4200/CP_M	6	t	136
+227	1984	SystemArchive\\Unit_MX8000/CP_M	6	t	137
+228	1987	SystemArchive\\AS4_SPC/Dosif_So	1	t	38
+229	1988	SystemArchive\\AS4_SPC/Dosif_So	2	t	38
+230	1989	SystemArchive\\AS4_SPC/Temp_MX5	5	t	44
+231	1990	SystemArchive\\AS4_SPC/Temp_MX5	5	t	46
+232	1991	SystemArchive\\AS4_SPC/Temp_MX5	5	t	47
+233	1992	SystemArchive\\Unit_MX5000/CP_M	6	t	50
+234	1993	SystemArchive\\Unit_MX5300/CP_M	6	t	51
+\.
+
+
+--
+-- Data for Name: tecnologia_mixer; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.tecnologia_mixer (id, tecnologia_id, mixer_id) FROM stdin;
+1	1	1
+2	2	1
+3	2	2
+4	2	3
+5	2	4
+6	2	5
+7	2	6
+8	3	3
+9	3	4
+10	3	5
+11	3	6
+\.
+
+
+--
+-- Data for Name: tecnologias; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.tecnologias (id, nombre, descripcion) FROM stdin;
+1	Benji	Benji
+2	Ecoobost	Ecoobost
+3	KingFisher	KingFisher
+\.
+
+
+--
+-- Data for Name: tendencias; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.tendencias (id, nombre, tipo, descripcion, tag, tag_codigo_producto, ultima_actualizacion, tv, tiempo_real, mixer_id) FROM stdin;
+11	AS1_SPC/Dosif_LW12700	STAX		Dosif_LW12700                                                                                       	1971	2019-02-18 14:37:41+00	f	f	1
+12	AS1_SPC/Dosif_Prifac_MX2	STAX		Dosif_Prifac_MX2                                                                                    	1972	2019-02-18 14:37:41+00	f	f	2
+13	AS1_SPC/Dosif_Salmu_MX2	STAX		Dosif_Salmu_MX2                                                                                     	1972	2019-02-18 14:37:41+00	f	f	2
+14	AS1_SPC/Dosif_SLES	STAX		Dosif_SLES                                                                                          	1971	2019-02-18 14:37:41+00	f	f	1
+15	AS1_SPC/Dosif_Soda_MX2	STAX		Dosif_Soda_MX2                                                                                      	1972	2019-02-18 14:37:41+00	f	f	2
+16	AS1_SPC/Dosif_Soda_PM2	STAX		Dosif_Soda_PM2                                                                                      	1971	2019-02-18 14:37:41+00	f	f	2
+17	AS1_SPC/Dosif_SRP_MX2	STAX		Dosif_SRP_MX2                                                                                       	1972	2019-02-18 14:37:41+00	f	f	2
+18	AS1_SPC/Dosif_TEA_MX2	STAX		Dosif_TEA_MX2                                                                                       	1972	2019-02-18 14:37:41+00	f	f	2
+19	AS1_SPC/Dosif_Unitol_MX2	STAX		Dosif_Unitol_MX2                                                                                    	1972	2019-02-18 14:37:41+00	f	f	2
+20	AS1_SPC/Ph_MX1200	STAX		Ph_MX1200                                                                                           	1971	2019-02-18 14:37:41+00	t	f	1
+21	AS1_SPC/Temp_LW12400	STAX		Temperatura MX1000 Antes de carga LW12400                                                           	1971	2019-02-18 14:37:41+00	t	f	1
+22	AS1_SPC/Temp_LW12700	STAX		Temp_LW12700                                                                                        	1971	2019-02-18 14:37:41+00	f	f	1
+23	AS1_SPC/Temp_MX2_Enzimas	STAX		Temp_MX2_Enzimas                                                                                    	1972	2019-02-18 14:37:41+00	f	f	2
+24	AS1_SPC/Temp_MX2_LW12000	STAX		Temp_MX2_LW12000                                                                                    	1972	2019-02-18 14:37:41+00	f	f	2
+25	AS4_SPC/Dosif_AgFlosoMX5	STAX		Dosif_AgFlosoMX5                                                                                    	1992	2019-02-18 14:37:41+00	f	f	5
+26	AS4_SPC/Dosif_Anac_MX5	STAX		Dosif_Anac_MX5                                                                                      	1992	2019-02-18 14:37:41+00	f	f	5
+27	AS4_SPC/Dosif_Clorhi_MX5	STAX		Dosif_Clorhi_MX5                                                                                    	1992	2019-02-18 14:37:41+00	f	f	5
+28	AS4_SPC/Dosif_Enzimas	STAX		Dosif_Enzimas                                                                                       	1971	2019-02-18 14:37:41+00	f	f	1
+29	AS4_SPC/Dosif_EPEI_MX5	STAX		Dosif_EPEI_MX5                                                                                      	1992	2019-02-18 14:37:41+00	f	f	5
+30	AS4_SPC/Dosif_fusor_PM8	STAX		Dosif_fusor_PM8                                                                                     	1971	2019-02-18 14:37:41+00	f	f	6
+31	AS4_SPC/Dosif_LAS_MX5	STAX		Dosif_LAS_MX5                                                                                       	1992	2019-02-18 14:37:41+00	f	f	5
+32	AS4_SPC/Dosif_LES_MX5	STAX		Dosif_LES_MX5                                                                                       	1992	2019-02-18 14:37:41+00	f	f	5
+33	AS4_SPC/Dosif_LW12200_M5	STAX		Dosif_LW12200_M5                                                                                    	1971	2019-02-18 14:37:41+00	f	f	5
+34	AS4_SPC/Dosif_Prifac_MX4	STAX		Dosif_Prifac_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+35	AS4_SPC/Dosif_Quat_PM8	STAX		Dosif_Quat_PM8                                                                                      	1971	2019-02-18 14:37:41+00	f	f	6
+36	AS4_SPC/Dosif_Salmu_MX5	STAX		Dosif_Salmu_MX5                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+37	AS4_SPC/Dosif_Soda_MX5	STAX		Dosif_Soda_MX5                                                                                      	1992	2019-02-18 14:37:41+00	f	f	5
+38	AS4_SPC/Dosif_Soda_PMX5	STAX		Dosif_Soda_PMX5                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+39	AS4_SPC/Dosif_SRP_MX5	STAX		Dosif_SRP_MX5                                                                                       	1992	2019-02-18 14:37:41+00	f	f	5
+40	AS4_SPC/Dosif_TEA_MX5	STAX		Dosif_TEA_MX5                                                                                       	1992	2019-02-18 14:37:41+00	f	f	5
+41	AS4_SPC/Dosif_Unitol_MX5	STAX		Dosif_Unitol_MX5                                                                                    	1992	2019-02-18 14:37:41+00	f	f	5
+42	AS4_SPC/DosifFlosoft_MX5	STAX		DosifFlosoft_MX5                                                                                    	1992	2019-02-18 14:37:41+00	f	f	5
+43	AS4_SPC/DosifLW12200_M5	STAX		DosifLW12200_M5                                                                                     	1971	2019-02-18 14:37:41+00	f	f	5
+2	AS1_SPC/Dosif_BigBag	STAX		Dosif_BigBag	1971	2019-02-18 14:37:41+00	t	f	1
+3	AS1_SPC/Dosif_Cumsulfsod	STAX		Dosif_Cumsulfsod	1971	2019-02-18 14:37:41+00	f	f	1
+4	AS1_SPC/Dosif_Enzimas	STAX		Dosif_Enzimas	1971	2019-02-18 14:37:41+00	f	f	1
+5	AS1_SPC/Dosif_EPEI_MX2	STAX		Dosif EPEI	1972	2019-02-18 14:37:41+00	f	f	2
+6	AS1_SPC/Dosif_LAS	STAX		Dosif_LAS	1971	2019-02-18 14:37:41+00	f	f	1
+7	AS1_SPC/Dosif_LAS_MX2	STAX		Dosif_LAS_MX2	1972	2019-02-18 14:37:41+00	f	f	2
+8	AS1_SPC/Dosif_LES_MX2	STAX		Dosif_LES_MX2	1972	2019-02-18 14:37:41+00	f	f	2
+9	AS1_SPC/Dosif_LW12200	STAX		Dosif_LW12200	1971	2019-02-18 14:37:41+00	f	f	1
+10	AS1_SPC/Dosif_LW12400	STAX		Dosif_LW12400	1971	2019-02-18 14:37:41+00	f	f	1
+44	AS4_SPC/Temp_MX5_Enzima	STAX		Temp_MX5_Enzima                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+45	AS4_SPC/Temp_MX5_Grasa	STAX		Temp_MX5_Grasa                                                                                      	1992	2019-02-18 14:37:41+00	f	f	5
+46	AS4_SPC/Temp_MX5_LW12000	STAX		Temp_MX5_LW12000                                                                                    	1992	2019-02-18 14:37:41+00	f	f	5
+47	AS4_SPC/Temp_MX5_Prifac	STAX		Temp_MX5_Prifac                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+48	AS4_SPC/Temp_MX5_Recirc	STAX		Temp_MX5_Recirc                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+49	AS4_SPC/WT_desc_premix5	STAX		WT_desc_premix5                                                                                     	1971	2019-02-18 14:37:41+00	f	f	5
+50	Unit_MX5000/CP_Mixer_5000	STAP		CP_Mixer_5000                                                                                       	\N	2019-01-01 00:00:00+00	f	f	5
+51	Unit_MX5300/CP_Mixer_5300	STAP		CP_Mixer_5300                                                                                       	\N	2019-01-01 00:00:00+00	f	f	5
+52	AS1_SPC/Temp_MX2_Prifac	STAX		Temp_MX2_Prifac                                                                                     	1972	2019-02-18 14:37:41+00	f	f	2
+53	Unit_MX1000/CP_Mixer_1000	STAP		CP_Mixer_1000                                                                                       	\N	2019-01-01 00:00:00+00	f	f	1
+54	Unit_MX2000/CP_Mixer_2000	STAP		CP_Mixer_2000                                                                                       	\N	2019-01-01 00:00:00+00	f	f	2
+55	AS2_SPC/Dosif_AgFlosoMX3	STAX		Dosif_AgFlosoMX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+56	AS2_SPC/Dosif_AgFlosoMX4	STAX		Dosif_AgFlosoMX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+57	AS2_SPC/Dosif_AgFlosoMX8	STAX		Dosif_AgFlosoMX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+58	AS2_SPC/Dosif_Anac_MX3	STAX		Dosif_Anac_MX3                                                                                      	1980	2019-02-18 14:37:41+00	f	f	3
+59	AS2_SPC/Dosif_Anac_MX4	STAX		Dosif_Anac_MX4                                                                                      	1982	2019-02-18 14:37:41+00	f	f	4
+60	AS2_SPC/Dosif_Anac_MX8	STAX		Dosif_Anac_MX8                                                                                      	1984	2019-02-18 14:37:41+00	f	f	6
+61	AS2_SPC/Dosif_Clorhi_MX3	STAX		Dosif_Clorhi_MX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+62	AS2_SPC/Dosif_Clorhi_MX4	STAX		Dosif_Clorhi_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+63	AS2_SPC/Dosif_Clorhi_MX8	STAX		Dosif_Clorhi_MX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+64	AS2_SPC/Dosif_Enzima_MX4	STAX		Dosif_Enzima_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+65	AS2_SPC/Dosif_Enzima_MX8	STAX		Dosif_Enzima_MX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+66	AS2_SPC/Dosif_EPEI_MX3	STAX		Dosif_EPEI_MX3                                                                                      	1980	2019-02-18 14:37:41+00	f	f	3
+67	AS2_SPC/Dosif_EPEI_MX4	STAX		Dosif_EPEI_MX4                                                                                      	1982	2019-02-18 14:37:41+00	f	f	4
+68	AS2_SPC/Dosif_EPEI_MX8	STAX		Dosif_EPEI_MX8                                                                                      	1984	2019-02-18 14:37:41+00	f	f	6
+69	AS2_SPC/Dosif_fusor_MX3	STAX		Dosif_fusor_MX3                                                                                     	1980	2019-02-18 14:37:41+00	f	f	3
+70	AS2_SPC/Dosif_fusor_MX4	STAX		Dosif_fusor_MX4                                                                                     	1982	2019-02-18 14:37:41+00	f	f	4
+71	AS2_SPC/Dosif_fusor_MX5	STAX		Dosif_fusor_MX5                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+72	AS2_SPC/Dosif_LAS_MX3	STAX		Dosif_LAS_MX3                                                                                       	1980	2019-02-18 14:37:41+00	f	f	3
+73	AS2_SPC/Dosif_LAS_MX4	STAX		Dosif_LAS_MX4                                                                                       	1982	2019-02-18 14:37:41+00	f	f	4
+74	AS2_SPC/Dosif_LAS_MX8	STAX		Dosif_LAS_MX8                                                                                       	1984	2019-02-18 14:37:41+00	f	f	6
+75	AS2_SPC/Dosif_LES_MX3	STAX		Dosif_LES_MX3                                                                                       	1980	2019-02-18 14:37:41+00	f	f	3
+76	AS2_SPC/Dosif_LES_MX4	STAX		Dosif_LES_MX4                                                                                       	1982	2019-02-18 14:37:41+00	f	f	4
+77	AS2_SPC/Dosif_LES_MX8	STAX		Dosif_LES_MX8                                                                                       	1984	2019-02-18 14:37:41+00	f	f	6
+78	AS2_SPC/Dosif_Prifac_MX3	STAX		Dosif_Prifac_MX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+79	AS2_SPC/Dosif_Prifac_MX4	STAX		Dosif_Prifac_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+80	AS2_SPC/Dosif_Prifac_MX8	STAX		Dosif_Prifac_MX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+81	AS2_SPC/Dosif_Quat_PM3	STAX		Dosif_Quat_PM3                                                                                      	1971	2019-02-18 14:37:41+00	f	f	3
+82	AS2_SPC/Dosif_Quat_PM4	STAX		Dosif_Quat_PM4                                                                                      	1971	2019-02-18 14:37:41+00	f	f	4
+83	AS2_SPC/Dosif_Quat_PM5	STAX		Dosif_Quat_PM5                                                                                      	1971	2019-02-18 14:37:41+00	f	f	5
+84	AS2_SPC/Dosif_Salmu_PMX3	STAX		Dosif_Salmu_PMX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+85	AS2_SPC/Dosif_Salmu_PMX4	STAX		Dosif_Salmu_PMX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+86	AS2_SPC/Dosif_Salmu_PMX8	STAX		Dosif_Salmu_PMX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+87	AS2_SPC/Dosif_Soda_MX3	STAX		Dosif_Soda_MX3                                                                                      	1980	2019-02-18 14:37:41+00	f	f	3
+88	AS2_SPC/Dosif_Soda_MX4	STAX		Dosif_Soda_MX4                                                                                      	1982	2019-02-18 14:37:41+00	f	f	4
+89	AS2_SPC/Dosif_Soda_MX8	STAX		Dosif_Soda_MX8                                                                                      	1984	2019-02-18 14:37:41+00	f	f	6
+90	AS2_SPC/Dosif_Soda_PMX3	STAX		Dosif_Soda_PMX3                                                                                     	1980	2019-02-18 14:37:41+00	f	f	3
+91	AS2_SPC/Dosif_SRP_MX3	STAX		Dosif_SRP_MX3                                                                                       	1980	2019-02-18 14:37:41+00	f	f	3
+92	AS2_SPC/Dosif_SRP_MX4	STAX		Dosif_SRP_MX4                                                                                       	1982	2019-02-18 14:37:41+00	f	f	4
+93	AS2_SPC/Dosif_SRP_MX8	STAX		Dosif_SRP_MX8                                                                                       	1984	2019-02-18 14:37:41+00	f	f	6
+94	AS2_SPC/Dosif_TEA_MX3	STAX		Dosif_TEA_MX3                                                                                       	1980	2019-02-18 14:37:41+00	f	f	3
+95	AS2_SPC/Dosif_TEA_MX4	STAX		Dosif_TEA_MX4                                                                                       	1982	2019-02-18 14:37:41+00	f	f	4
+96	AS2_SPC/Dosif_TEA_MX8	STAX		Dosif_TEA_MX8                                                                                       	1984	2019-02-18 14:37:41+00	f	f	6
+97	AS2_SPC/Dosif_Unitol_MX3	STAX		Dosif_Unitol_MX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+98	AS2_SPC/Dosif_Unitol_MX4	STAX		Dosif_Unitol_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+99	AS2_SPC/Dosif_Unitol_MX8	STAX		Dosif_Unitol_MX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+100	AS2_SPC/DosifFlosoft_MX3	STAX		DosifFlosoft_MX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+101	AS2_SPC/DosifFlosoft_MX4	STAX		DosifFlosoft_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+102	AS2_SPC/DosifFlosoft_MX8	STAX		DosifFlosoft_MX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+103	AS2_SPC/DosifLW12200_M3	STAX		DosifLW12200_M3                                                                                     	1980	2019-02-18 14:37:41+00	f	f	3
+104	AS2_SPC/DosifLW12200_M4	STAX		DosifLW12200_M4                                                                                     	1982	2019-02-18 14:37:41+00	f	f	4
+105	AS2_SPC/DosifLW12200_M8	STAX		DosifLW12200_M8                                                                                     	1984	2019-02-18 14:37:41+00	f	f	6
+106	AS2_SPC/DosifLW12200_MX3	STAX		DosifLW12200_MX3                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+107	AS2_SPC/DosifLW12200_MX4	STAX		DosifLW12200_MX4                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+108	AS2_SPC/DosifLW12200_MX8	STAX		DosifLW12200_MX8                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+109	AS2_SPC/Temp_fusor_PMX3	STAX		Temp_fusor_PMX3                                                                                     	1980	2019-02-18 14:37:41+00	f	f	3
+110	AS2_SPC/Temp_fusor_PMX4	STAX		Temp_fusor_PMX4                                                                                     	1982	2019-02-18 14:37:41+00	f	f	4
+111	AS2_SPC/Temp_fusor_PMX5	STAX		Temp_fusor_PMX5                                                                                     	1992	2019-02-18 14:37:41+00	f	f	5
+112	AS2_SPC/Temp_MX3_Grasa	STAX		Temp_MX3_Grasa                                                                                      	1980	2019-02-18 14:37:41+00	f	f	3
+113	AS2_SPC/Temp_MX3_LW12000	STAX		Temp_MX3_LW12000                                                                                    	1980	2019-02-18 14:37:41+00	f	f	3
+114	AS2_SPC/Temp_MX3_Prifac	STAX		Temp_MX3_Prifac                                                                                     	1980	2019-02-18 14:37:41+00	f	f	3
+115	AS2_SPC/Temp_MX3_Recirc	STAX		Temp_MX3_Recirc                                                                                     	1980	2019-02-18 14:37:41+00	f	f	3
+116	AS2_SPC/Temp_MX4_Enzima	STAX		Temp_MX4_Enzima                                                                                     	1982	2019-02-18 14:37:41+00	f	f	4
+117	AS2_SPC/Temp_MX4_Grasa	STAX		Temp_MX4_Grasa                                                                                      	1982	2019-02-18 14:37:41+00	f	f	4
+118	AS2_SPC/Temp_MX4_LW12000	STAX		Temp_MX4_LW12000                                                                                    	1982	2019-02-18 14:37:41+00	f	f	4
+119	AS2_SPC/Temp_MX4_Prifac	STAX		Temp_MX4_Prifac                                                                                     	1982	2019-02-18 14:37:41+00	f	f	4
+120	AS2_SPC/Temp_MX4_Recirc	STAX		Temp_MX4_Recirc                                                                                     	1982	2019-02-18 14:37:41+00	f	f	4
+121	AS2_SPC/Temp_MX8_Enzima	STAX		Temp_MX8_Enzima                                                                                     	1984	2019-02-18 14:37:41+00	f	f	6
+122	AS2_SPC/Temp_MX8_Grasa	STAX		Temp_MX8_Grasa                                                                                      	1984	2019-02-18 14:37:41+00	f	f	6
+123	AS2_SPC/Temp_MX8_LW12000	STAX		Temp_MX8_LW12000                                                                                    	1984	2019-02-18 14:37:41+00	f	f	6
+124	AS2_SPC/Temp_MX8_Prifac	STAX		Temp_MX8_Prifac                                                                                     	1984	2019-02-18 14:37:41+00	f	f	6
+125	AS2_SPC/Temp_MX8_Recirc	STAX		Temp_MX8_Recirc                                                                                     	1984	2019-02-18 14:37:41+00	f	f	6
+126	AS2_SPC/Temp_PM3_Descarg	STAX		Temp_PM3_Descarg                                                                                    	1971	2019-02-18 14:37:41+00	f	f	3
+127	AS2_SPC/Temp_PM4_Descarg	STAX		Temp_PM4_Descarg                                                                                    	1971	2019-02-18 14:37:41+00	f	f	4
+128	AS2_SPC/Temp_PM5_Descarg	STAX		Temp_PM5_Descarg                                                                                    	1971	2019-02-18 14:37:41+00	f	f	5
+129	AS2_SPC/Temp_PM8_Descar	STAX		Temp_PM8_Descar                                                                                     	1971	2019-02-18 14:37:41+00	f	f	6
+130	AS2_SPC/WT_desc_premix3	STAX		WT_desc_premix3                                                                                     	1971	2019-02-18 14:37:41+00	f	f	3
+131	AS2_SPC/WT_desc_premix4	STAX		WT_desc_premix4                                                                                     	1971	2019-02-18 14:37:41+00	f	f	4
+132	AS2_SPC/WT_desc_premix8	STAX		WT_desc_premix8                                                                                     	1971	2019-02-18 14:37:41+00	f	f	6
+133	Unit_MX3000/CP_Mixer_3000	STAP		CP_Mixer_3000                                                                                       	\N	2019-01-01 00:00:00+00	f	f	3
+134	Unit_MX3200/CP_Mixer_3200	STAP		CP_Mixer_3200                                                                                       	\N	2019-01-01 00:00:00+00	f	f	3
+135	Unit_MX4000/CP_Mixer_4000	STAP		CP_Mixer_4000                                                                                       	\N	2019-01-01 00:00:00+00	f	f	4
+136	Unit_MX4200/CP_Mixer_4200	STAP		CP_Mixer_4200                                                                                       	\N	2019-01-01 00:00:00+00	f	f	4
+137	Unit_MX8000/CP_Mixer_8000	STAP		CP_Mixer_8000                                                                                       	\N	2019-01-01 00:00:00+00	f	f	6
+1	AS1_SPC/Dosif_Anac_MX2	STAX		Dosif_Anac	1972	2019-02-18 14:37:41+00	f	f	2
+\.
+
+
+--
+-- Data for Name: tokens; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.tokens (id, user_id, token, type, is_revoked, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: sysa
+--
+
+COPY public.users (id, username, email, password, created_at, updated_at) FROM stdin;
+1	admin	admin@unilever.com	$2a$10$LJ1OdsZJRKW9/c/7iBDw1eXjhtVjxiZ8SJndvffNmI11CVFchxNYK	2019-03-14 12:13:35+00	2019-03-14 12:13:35+00
+\.
+
+
+--
+-- Name: adonis_schema_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.adonis_schema_id_seq', 13, true);
+
+
+--
+-- Name: alarmas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.alarmas_id_seq', 1, false);
+
+
+--
+-- Name: destinatarios_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.destinatarios_id_seq', 1, false);
+
+
+--
+-- Name: limites_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.limites_id_seq', 1, false);
+
+
+--
+-- Name: mixer_producto_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.mixer_producto_id_seq', 92, true);
+
+
+--
+-- Name: mixers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.mixers_id_seq', 6, true);
+
+
+--
+-- Name: productos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.productos_id_seq', 37, true);
+
+
+--
+-- Name: tags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.tags_id_seq', 234, true);
+
+
+--
+-- Name: tecnologia_mixer_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.tecnologia_mixer_id_seq', 11, true);
+
+
+--
+-- Name: tecnologias_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.tecnologias_id_seq', 3, true);
+
+
+--
+-- Name: tokens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.tokens_id_seq', 1, false);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sysa
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 1, true);
+
+
+--
+-- Name: adonis_schema adonis_schema_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.adonis_schema
+    ADD CONSTRAINT adonis_schema_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: alarmas alarmas_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.alarmas
+    ADD CONSTRAINT alarmas_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: destinatarios destinatarios_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.destinatarios
+    ADD CONSTRAINT destinatarios_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: limites limites_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.limites
+    ADD CONSTRAINT limites_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mixer_producto mixer_producto_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.mixer_producto
+    ADD CONSTRAINT mixer_producto_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: mixers mixers_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.mixers
+    ADD CONSTRAINT mixers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: productos productos_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.productos
+    ADD CONSTRAINT productos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tecnologia_mixer tecnologia_mixer_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tecnologia_mixer
+    ADD CONSTRAINT tecnologia_mixer_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tecnologias tecnologias_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tecnologias
+    ADD CONSTRAINT tecnologias_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tendencias tendencias_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tendencias
+    ADD CONSTRAINT tendencias_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tokens tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tokens
+    ADD CONSTRAINT tokens_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tokens tokens_token_unique; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tokens
+    ADD CONSTRAINT tokens_token_unique UNIQUE (token);
+
+
+--
+-- Name: users users_email_unique; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_unique UNIQUE (email);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_username_unique; Type: CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_unique UNIQUE (username);
+
+
+--
+-- Name: tokens_token_index; Type: INDEX; Schema: public; Owner: sysa
+--
+
+CREATE INDEX tokens_token_index ON public.tokens USING btree (token);
+
+
+--
+-- Name: historicos historicos_tendencia_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.historicos
+    ADD CONSTRAINT historicos_tendencia_id_foreign FOREIGN KEY (tendencia_id) REFERENCES public.tendencias(id) ON DELETE CASCADE;
+
+
+--
+-- Name: limites limites_tendencia_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.limites
+    ADD CONSTRAINT limites_tendencia_id_foreign FOREIGN KEY (tendencia_id) REFERENCES public.tendencias(id) ON DELETE CASCADE;
+
+
+--
+-- Name: mixer_producto mixer_producto_mixer_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.mixer_producto
+    ADD CONSTRAINT mixer_producto_mixer_id_foreign FOREIGN KEY (mixer_id) REFERENCES public.mixers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: mixer_producto mixer_producto_producto_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.mixer_producto
+    ADD CONSTRAINT mixer_producto_producto_id_foreign FOREIGN KEY (producto_id) REFERENCES public.productos(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tags tags_tendencia_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tags
+    ADD CONSTRAINT tags_tendencia_id_foreign FOREIGN KEY (tendencia_id) REFERENCES public.tendencias(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tecnologia_mixer tecnologia_mixer_mixer_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tecnologia_mixer
+    ADD CONSTRAINT tecnologia_mixer_mixer_id_foreign FOREIGN KEY (mixer_id) REFERENCES public.mixers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tecnologia_mixer tecnologia_mixer_tecnologia_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tecnologia_mixer
+    ADD CONSTRAINT tecnologia_mixer_tecnologia_id_foreign FOREIGN KEY (tecnologia_id) REFERENCES public.tecnologias(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tendencias tendencias_mixer_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tendencias
+    ADD CONSTRAINT tendencias_mixer_id_foreign FOREIGN KEY (mixer_id) REFERENCES public.mixers(id) ON DELETE CASCADE;
+
+
+--
+-- Name: tokens tokens_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: sysa
+--
+
+ALTER TABLE ONLY public.tokens
+    ADD CONSTRAINT tokens_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+

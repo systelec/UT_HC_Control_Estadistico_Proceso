@@ -1,2 +1,2 @@
-command yarn install
+command npm install
 command adonis serve --dev
