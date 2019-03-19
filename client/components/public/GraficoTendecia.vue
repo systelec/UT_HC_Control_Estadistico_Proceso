@@ -124,6 +124,8 @@ export default {
     },
     async aplicarFiltroTendencia() {
       if (this.tendenciaSeleccionada) {
+        this.codigoProductoSelecionado = 'Todos'
+
         // Busco tendencia seleccionada de datos del socket
         this.datosTendencia = this.datosSocket.find(item => {
           if (
@@ -133,7 +135,6 @@ export default {
             return true
           }
         })
-      
 
         // Concateno historicos con los historicos del socket
         this.historicosAcumulados = this.historicos
@@ -170,11 +171,18 @@ export default {
     }
   },
 
+  destroyed() {
+    this.SET_TENDENCIA_SELECCIONADA(null)
+    this.SET_HISTORICOS_FILTRADOS_POR_PRODUCTO([])
+    this.SET_LIMITE_FILTRADO_POR_PRODUCTO(null)
+  },
+
   methods: {
     ...mapMutations([
       'SET_PAYLOAD_HISTORICOS',
       'SET_HISTORICOS_FILTRADOS_POR_PRODUCTO',
-      'SET_LIMITE_FILTRADO_POR_PRODUCTO'
+      'SET_LIMITE_FILTRADO_POR_PRODUCTO',
+      'SET_TENDENCIA_SELECCIONADA'
     ]),
     ...mapActions(['getAllHistoricos', 'getAllLimites']),
     graficarTendencias() {
@@ -245,8 +253,8 @@ export default {
       let LL2Sigma = this.limite.ll_2sigma
       let LH3Sigma = this.limite.lh_3sigma
       let LL3Sigma = this.limite.ll_3sigma
-      let max = mathjs.round(this.limite.usl * 1.01, 2)
-      let min = mathjs.round(this.limite.lsl * 0.99, 2)
+      let max = mathjs.round(this.limite.usl + 1, 2)
+      let min = mathjs.round(this.limite.lsl - 1, 2)
       let maxR = mathjs.round(this.limite.usl_rango * 1.01, 2)
       let minR = mathjs.round(this.limite.lsl_rango * 0.99, 2)
       let intervalyAxis = mathjs.round((max - min) / 10, 3)
@@ -423,7 +431,12 @@ export default {
             type: 'value',
             max: max,
             min: min,
-            interval: intervalyAxis
+            interval: intervalyAxis,
+            axisLine: {
+              lineStyle: {
+                color: '#90979c'
+              }
+            }
           },
           {
             gridIndex: 1,
@@ -436,7 +449,12 @@ export default {
             type: 'value',
             max: maxR,
             min: minR,
-            interval: intervalyAxisR
+            interval: intervalyAxisR,
+            axisLine: {
+              lineStyle: {
+                color: '#90979c'
+              }
+            }
           }
         ],
         series: [

@@ -10,7 +10,7 @@ async function cyclicEvent() {
     setTimeout(async () => {
       await AdquisicionDatos.rapida();
       cyclicEvent();
-    }, 60000);
+    }, 20000);
 
     return Promise.resolve();
   } catch (error) {

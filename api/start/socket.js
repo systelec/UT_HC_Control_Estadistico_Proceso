@@ -28,6 +28,10 @@ try {
         .getCount();
       await Redis.set('cantidad_alarmas_sin_reconocer', cantidadAlarmSinReconocer);
       socket.broadcastToAll('cantidad_alarmas_sin_reconocer', cantidadAlarmSinReconocer);
+
+      // Emito ultimo valor del socket
+      const datosSocket = await Redis.get('datos_socket');
+      socket.broadcastToAll('variables', datosSocket);
     } catch (error) {
       console.log(error);
     }

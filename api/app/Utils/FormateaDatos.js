@@ -66,7 +66,8 @@ var FormateaDatos = {
         tendencia: {
           id: tendencia.id,
           nombre: tendencia.nombre,
-          tag: tendencia.tag
+          tag: tendencia.tag,
+          tv: tendencia.tv
         },
         limites: tendencia.limites
       };

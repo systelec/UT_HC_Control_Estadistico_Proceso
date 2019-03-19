@@ -1,6 +1,6 @@
 if [ $MODE = "dev" ]; then
     echo "Ejecutando servidor en modo desarrollo"
-    command npm run dev
+    command yarn run dev
 fi
 
 if [ $MODE = "prod" ]; then 

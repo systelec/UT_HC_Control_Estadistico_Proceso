@@ -1,21 +1,36 @@
 <template>
-  <div>
-    <img class="loading" v-if="loadingTv5Grafico" src="../../../static/charts.png" width="50">
-    <div :style="` border: ${fueraLimite}px solid red;`">
-      <h3 class="titulo">{{ titulo }}</h3>
-      <div id="GraficoTV5"></div>
-    </div>
+  <div class="carta white">
+    <img class="loading" v-if="loading" src="../../../static/charts.png" width="50">
+    <v-layout row wrap :style="` border: ${fueraLimite}px solid red;`">
+      <v-flex xs8 text-xs-left>
+        <h2 class="ml-3 titulo">{{ titulo }}</h2>
+      </v-flex>
+      <v-flex xs4 text-xs-right>
+        <v-chip label outline color="blue">
+          <strong class="mr-3">{{codigoProductoUltimo}}</strong>
+          {{fechaUltimoHistorico}}
+        </v-chip>
+        <v-chip label outline color="green">
+          <strong>{{codigoProductoActual}}</strong>
+        </v-chip>
+      </v-flex>
+      <v-flex xs12>
+        <div id="GraficoTV5"></div>
+      </v-flex>
+    </v-layout>
   </div>
 </template>
 
 <style scoped>
 #GraficoTV5 {
   width: 100%;
-  height: 32vh;
+  height: 24vh;
+}
+.carta {
+  height: 30vh;
 }
 .titulo {
-  margin-bottom: -30px;
-  color: rgb(94, 111, 136);
+  color: rgb(82, 130, 201);
 }
 .loading {
   margin-top: 10vh;
@@ -42,179 +57,117 @@ import echarts from 'echarts'
 import ecStat from 'echarts-stat'
 import { mapGetters } from 'vuex'
 import mathjs from 'mathjs'
+import axios from '@/plugins/axios'
 
 export default {
   data: () => ({
+    tv: 5,
+    chart: null,
+    datosTendencia: null,
+    historicosAcumulados: null,
+    loading: false,
+    fueraLimite: false,
+    tendencia: null,
     titulo: '',
-    fueraLimite: '0'
+    codigoProductoActual: null,
+    codigoProductoUltimo: null,
+    fechaUltimoHistorico: null,
+    limite: {
+      lh_1sigma: 0,
+      ll_1sigma: 0,
+      lh_2sigma: 0,
+      ll_2sigma: 0,
+      lh_3sigma: 0,
+      ll_3sigma: 0,
+      usl: 0,
+      lsl: 0,
+      usl_rango: 0,
+      lsl_rango: 0,
+      media_historica: 0,
+      media_rango_historica: 0,
+      codigo_producto: null
+    }
   }),
 
   computed: {
-    ...mapGetters([
-      'variablesTv5TiempoReal',
-      'variablesTv5Historicas',
-      'actualizarTv5Grafico',
-      'loadingTv5Grafico'
-    ])
+    ...mapGetters(['datosSocket'])
   },
 
   watch: {
-    actualizarTv5Grafico() {
-      if (this.variablesTv5Historicas) {
-        this.graficarTendencias()
-      }
+    async datosSocket() {
+      await this.validaDatosyGrafica()
     }
   },
 
-  mounted() {
-    if (this.variablesTv5Historicas) {
-      this.graficarTendencias()
-    }
+  async mounted() {
+    await this.validaDatosyGrafica()
   },
 
   methods: {
     graficarTendencias() {
-      let myChart = echarts.init(document.getElementById('GraficoTV5'))
-
-      this.titulo = this.variablesTv5Historicas
-        ? this.variablesTv5Historicas.Tendencia
-        : ''
-
-      this.fueraLimite = this.variablesTv5Historicas
-        ? this.variablesTv5Historicas.Fuera_Limite
-        : ''
-
-      let intervalo = 1000000
-      let limite = this.variablesTv5Historicas.Limite || null
-      let media = 0
-      let mediaR = 0
-      let lsl = 0
-      let usl = 0
-      let lslR = 0
-      let uslR = 0
-
-      let LH1Sigma = 0
-      let LL1Sigma = 0
-      let LH2Sigma = 0
-      let LL2Sigma = 0
-      let LH3Sigma = 0
-      let LL3Sigma = 0
-
-      if (limite) {
-        media = mathjs.round(limite.MediaHistorica, 2)
-        mediaR = mathjs.round(limite.MediaRangoHistorica, 2)
-        lsl = limite.LSL
-        usl = limite.USL
-        lslR = limite.LSLR
-        uslR = limite.USLR
-
-        LH1Sigma = limite.LH_1Sigma
-        LL1Sigma = limite.LL_1Sigma
-        LH2Sigma = limite.LH_2Sigma
-        LL2Sigma = limite.LL_2Sigma
-        LH3Sigma = limite.LH_3Sigma
-        LL3Sigma = limite.LL_3Sigma
+      if (!this.chart) {
+        this.chart = echarts.init(document.getElementById('GraficoTV5'))
       }
 
-      let max = mathjs.round(usl * 1.01, 2)
-      let min = mathjs.round(lsl * 0.99, 2)
-      let maxR = mathjs.round(uslR * 1.01, 2)
-      let minR = mathjs.round(lslR * 0.99, 2)
-      let intervalyAxis = mathjs.round((max - min) / 10, 2)
-      let intervalyAxisR = mathjs.round((maxR - minR) / 10, 2)
-
-      let hasta = moment(
-        this.variablesTv5Historicas ? this.variablesTv5Historicas.Hasta : ''
-      )
-      let desde = moment(
-        this.variablesTv5Historicas ? this.variablesTv5Historicas.Desde : ''
-      ).add(-intervalo, 'seconds')
-
-      let historicos = this.variablesTv5Historicas
-        ? this.variablesTv5Historicas.Historicos
-        : []
-      let valuesPV = historicos
-        .filter(historico => {
-          if (historico.PV) {
-            return true
-          }
-          return false
-        })
-        .map(historico => {
-          return mathjs.round(historico.PV, 2)
-        })
-      let data = historicos.map(historico => {
-        return moment(historico.Fecha).format('YYYY-MM-DD HH:mm:ss')
-      })
-
-      let valuesSP = historicos
-        .filter(historico => {
-          if (historico.SP) {
-            return true
-          }
-          return false
-        })
-        .map(historico => {
-          return mathjs.round(historico.SP, 2)
-        })
-
-      let valuesCodigoProductos = historicos.map(historico => {
-        return historico.CodigoProducto
-      })
-
-      let markAreaCodigoProductos = data.filter((producto, i) => {
-        if (i === 0) {
-          return true
-        } else {
-          if (valuesCodigoProductos[i - 1] !== valuesCodigoProductos[i]) {
-            return true
-          }
-        }
-        return false
-      })
-
-      markAreaCodigoProductos.push(data[data.length - 1])
-      markAreaCodigoProductos = markAreaCodigoProductos
-        .map((item, i) => {
-          if (i < markAreaCodigoProductos.length - 1) {
-            return [
-              { xAxis: markAreaCodigoProductos[i] },
-              { xAxis: markAreaCodigoProductos[i + 1] }
+      let historicos = this.historicosAcumulados.historicos
+      this.limite =
+        this.historicosAcumulados.limites.length > 0
+          ? this.historicosAcumulados.limites[
+              this.historicosAcumulados.limites.length - 1
             ]
-          }
-        })
-        .filter(item => {
-          if (item) {
-            return true
-          }
-          return false
-        })
+          : {
+              lh_1sigma: 0,
+              ll_1sigma: 0,
+              lh_2sigma: 0,
+              ll_2sigma: 0,
+              lh_3sigma: 0,
+              ll_3sigma: 0,
+              usl: 0,
+              lsl: 0,
+              usl_rango: 0,
+              lsl_rango: 0,
+              media_historica: 0,
+              media_rango_historica: 0,
+              codigo_producto: null
+            }
 
-      let histogramaCategory = []
-      let histogramaValues = []
+      let media = this.limite.media_historica
+      let mediaR = this.limite.media_rango_historica
+      let lsl = this.limite.lsl
+      let usl = this.limite.usl
+      let lslR = this.limite.lsl_rango
+      let uslR = this.limite.usl_rango
 
-      // var girth = valuesPV
-      // let bins = ecStat.histogram(girth)
+      let LH1Sigma = this.limite.lh_1sigma
+      let LL1Sigma = this.limite.ll_1sigma
+      let LH2Sigma = this.limite.lh_2sigma
+      let LL2Sigma = this.limite.ll_2sigma
+      let LH3Sigma = this.limite.lh_3sigma
+      let LL3Sigma = this.limite.ll_3sigma
+      let max = mathjs.round(this.limite.usl + 1, 2)
+      let min = mathjs.round(this.limite.lsl - 1, 2)
+      let maxR = mathjs.round(this.limite.usl_rango * 1.01, 2)
+      let minR = mathjs.round(this.limite.lsl_rango * 0.99, 2)
+      let intervalyAxis = mathjs.round((max - min) / 10, 3)
+      let intervalyAxisR = mathjs.round((maxR - minR) / 10, 3)
 
-      let interaciones = 14
-      let intervaloCategorias = (max - min) / interaciones
-      let j = 0
-      let categoria = min
-      let cantidad
+      let data = historicos.map(historico => {
+        return moment(historico.fecha).format('YYYY-MM-DD HH:mm:ss')
+      })
 
-      for (j; j < interaciones; j++) {
-        cantidad = valuesPV.filter(item => {
-          if (item > categoria && item < categoria + intervaloCategorias) {
-            return true
-          }
-          return false
-        })
+      let valuesPV = historicos.map(historico => {
+        if (historico.pv) {
+          return mathjs.round(historico.pv, 2)
+        }
+        return 0
+      })
 
-        histogramaCategory.push(mathjs.round(categoria, 2))
-        histogramaValues.push(cantidad.length)
-
-        categoria = categoria + intervaloCategorias
-      }
+      let valuesSP = historicos.map(historico => {
+        if (historico.sp) {
+          return mathjs.round(historico.sp, 2)
+        }
+        return 0
+      })
 
       let option = {
         color: ['#3398DB'],
@@ -227,11 +180,25 @@ export default {
             }
           }
         },
+        grid: [
+          {
+            left: '2%',
+            top: '4%',
+            height: '92%',
+            width: '90%',
+            containLabel: true
+          }
+        ],
         xAxis: [
           {
             gridIndex: 0,
             type: 'category',
-            data: data
+            data: data,
+            axisLine: {
+              lineStyle: {
+                color: '#90979c'
+              }
+            }
           }
         ],
         yAxis: [
@@ -240,45 +207,21 @@ export default {
             type: 'value',
             max: max,
             min: min,
-            interval: intervalyAxis
+            interval: intervalyAxis,
+            axisLine: {
+              lineStyle: {
+                color: '#90979c'
+              }
+            }
           }
         ],
         series: [
-          {
-            name: 'Cod. Prod',
-            data: valuesCodigoProductos,
-            smooth: false,
-            step: 'start',
-            type: 'custom',
-            symbolSize: 0,
-            xAxisIndex: 0,
-            yAxisIndex: 0,
-            lineStyle: {
-              normal: {
-                width: 0,
-                color: 'blue'
-              }
-            },
-            markArea: {
-              silent: true,
-              data: [
-                [
-                  {
-                    xAxis: '2019-01-13 05:42:16'
-                  },
-                  {
-                    xAxis: '2019-01-14 16:35:16'
-                  }
-                ]
-              ]
-            }
-          },
           {
             name: 'PV',
             data: valuesPV,
             smooth: false,
             type: 'line',
-            symbolSize: 7,
+            symbolSize: 0,
             xAxisIndex: 0,
             yAxisIndex: 0,
             lineStyle: {
@@ -462,7 +405,7 @@ export default {
             type: 'line',
             smooth: false,
             type: 'line',
-            symbolSize: 7,
+            symbolSize: 0,
             xAxisIndex: 0,
             yAxisIndex: 0,
             lineStyle: {
@@ -475,7 +418,78 @@ export default {
         ]
       }
 
-      myChart.setOption(option)
+      this.chart.setOption(option)
+    },
+    async getHistoricos() {
+      this.loading = true
+      await axios
+        .get(`historicos?tendencia=${this.tendencia.id}`)
+        .then(response => {
+          this.loading = false
+          this.historicosAcumulados = response.data
+        })
+    },
+    async validaDatosyGrafica() {
+      if (this.datosSocket.length > 0) {
+        this.datosTendencia = this.datosSocket[this.tv - 1]
+
+        if (!this.tendencia) {
+          this.tendencia = this.datosTendencia.tendencia
+          await this.getHistoricos()
+        }
+        if (this.tendencia.id !== this.datosTendencia.tendencia.id) {
+          this.tendencia = this.datosTendencia.tendencia
+          await this.getHistoricos()
+        }
+
+        this.codigoProductoActual = this.datosTendencia.producto
+        this.titulo = this.datosTendencia.tendencia.tag
+        this.tendencia = this.datosTendencia.tendencia
+        this.historicosAcumulados.hasta = this.datosTendencia.hasta
+        this.historicosAcumulados.producto = this.datosTendencia.producto
+        this.historicosAcumulados.tendencia = this.datosTendencia.tendencia
+        this.fueraLimite = this.datosTendencia.cantidad_alarmas
+
+        this.codigoProductoUltimo =
+          this.datosTendencia.historicos.length > 0
+            ? this.datosTendencia.historicos[
+                this.datosTendencia.historicos.length - 1
+              ].codigo_producto
+            : null
+
+        if (!this.codigoProductoUltimo) {
+          this.codigoProductoUltimo =
+            this.historicosAcumulados.historicos.length > 0
+              ? this.historicosAcumulados.historicos[
+                  this.historicosAcumulados.historicos.length - 1
+                ].codigo_producto
+              : null
+        }
+        this.fechaUltimoHistorico =
+          this.datosTendencia.historicos.length > 0
+            ? this.datosTendencia.historicos[
+                this.datosTendencia.historicos.length - 1
+              ].fecha
+            : null
+
+        if (!this.fechaUltimoHistorico) {
+          this.fechaUltimoHistorico =
+            this.historicosAcumulados.historicos.length > 0
+              ? this.historicosAcumulados.historicos[
+                  this.historicosAcumulados.historicos.length - 1
+                ].fecha
+              : null
+        }
+
+        this.datosTendencia.historicos.map(historico => {
+          this.historicosAcumulados.historicos.push(historico)
+        })
+        this.datosTendencia.limites.map(limite => {
+          this.historicosAcumulados.limites.push(limite)
+        })
+
+        this.graficarTendencias()
+      }
     }
   }
 }

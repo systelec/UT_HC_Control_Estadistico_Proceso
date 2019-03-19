@@ -4,7 +4,7 @@ const Limite = use('App/Models/Limite');
 const Historico = use('App/Models/Historico');
 const Database = use('Database');
 const moment = require('moment');
-const mathjs = require('mathjs')
+const mathjs = require('mathjs');
 
 class LimiteController {
   async index({ request, response }) {
@@ -168,58 +168,54 @@ class LimiteController {
     response.status(201).json(transaction);
   }
 
-
-  async limiteByHistoricos ({ request, response }) {
-    const data = request.only([
-      'tendencia',
-      'codigo_producto'
-    ]);
+  async limiteByHistoricos({ request, response }) {
+    const data = request.only(['tendencia', 'codigo_producto']);
     const codigoProducto = data.codigo_producto || null;
-    
-    const historicos = await Database
-      .table('historicos')
+
+    const historicos = await Database.table('historicos')
       .where('tendencia_id', data.tendencia)
       .orderBy('fecha', 'ASC')
       .offset(0)
-      .limit(30)
-         
+      .limit(30);
 
     // Calculo datos necesarios para limites
     let pv = historicos.map(item => {
-      return item.pv
-    })
+      return item.pv;
+    });
 
     let rangos = pv
       .map((item, i) => {
         if (i < pv.length - 1) {
-          return mathjs.round(Math.abs(pv[i + 1] - pv[i]), 2)
+          return mathjs.round(Math.abs(pv[i + 1] - pv[i]), 2);
         }
       })
       .filter(item => {
         if (item) {
-          return true
+          return true;
         }
-      })
+      });
 
-    let std = mathjs.std(pv)
-    let std_rango = mathjs.std(rangos)
-    let media = mathjs.mean(pv)
-    let media_rango = mathjs.median(rangos)
+    let limite = null;
+    if (pv.length > 3) {
+      let std = mathjs.std(pv);
+      let std_rango = mathjs.std(rangos);
+      let media = mathjs.mean(pv);
+      let media_rango = mathjs.median(rangos);
 
-    const lh_1sigma = media + std*1
-    const ll_1sigma = media - std*1
-    const lh_2sigma = media + std*2
-    const ll_2sigma = media - std*2
-    const lh_3sigma = media + std*3
-    const ll_3sigma = media - std*3
-    const usl = media + std*4
-    const lsl = media - std*4
-    const usl_rango = media_rango + std_rango*1
-    const lsl_rango = media_rango + std_rango*1
-    const media_historica = media
-    const media_rango_historica = media_rango
+      const lh_1sigma = media + std * 1;
+      const ll_1sigma = media - std * 1;
+      const lh_2sigma = media + std * 2;
+      const ll_2sigma = media - std * 2;
+      const lh_3sigma = media + std * 3;
+      const ll_3sigma = media - std * 3;
+      const usl = media + std * 4;
+      const lsl = media - std * 4;
+      const usl_rango = media_rango + std_rango * 1;
+      const lsl_rango = media_rango - std_rango * 1;
+      const media_historica = media;
+      const media_rango_historica = media_rango;
 
-    const limite = {
+      limite = {
         lh_1sigma: mathjs.round(lh_1sigma, 2),
         ll_1sigma: mathjs.round(ll_1sigma, 2),
         lh_2sigma: mathjs.round(lh_2sigma, 2),
@@ -234,8 +230,8 @@ class LimiteController {
         media_rango_historica: mathjs.round(media_rango_historica, 2),
         codigo_producto: codigoProducto,
         tendencia_id: data.tendencia
+      };
     }
-
 
     response.status(200).json(limite);
   }

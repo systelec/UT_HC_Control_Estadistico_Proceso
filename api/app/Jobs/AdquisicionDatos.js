@@ -34,7 +34,7 @@ module.exports = {
       const fechas = await FechaAdquisicion.arrayDesdeHasta();
       const desde = fechas[0];
       const hasta = fechas[1];
-      
+
       // const desde = '2019-02-20 00:00:00';
       // const hasta = '2019-02-24 17:00:00';
       const arrayIteraciones = await FechaAdquisicion.arrayIteraciones(desde, hasta);
@@ -120,6 +120,7 @@ module.exports = {
 
         // Verfico si los historicos cumplen con las reglas (TRATAR DE MEJOR A FUTURO - COMPLEJIDA N SEGUN LA CANTIDAD DE HISTORICOS)
         let i = 0;
+
         for (const historico of historicosFormateado) {
           const limite = await Limite.query()
             .where('created_at', '<', historico.fecha)
@@ -150,13 +151,18 @@ module.exports = {
         await Redis.set('desde', JSON.stringify(fecha.hasta));
 
         // Formateo datos para emitir por socket
-        const datos = await FormateaDatos.sockets(
+        let datos = await FormateaDatos.sockets(
           codigosProductosActuales,
           historicosFormateado,
           tendencias,
           fecha.desde,
           fecha.hasta
         );
+        datos = datos.sort((a, b) => {
+          return a.tendencia.tv === b.tendencia.tv ? 0 : a.tendencia.tv ? -1 : 1;
+        });
+
+        await Redis.set('datos_socket', JSON.stringify(datos));
 
         // Emito por socket a todos los usuarios
         try {
